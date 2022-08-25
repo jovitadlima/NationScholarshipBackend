@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ScholarshipDbContext))]
-    [Migration("20220825153616_InitialClass")]
-    partial class InitialClass
+    [Migration("20220825161133_AddedField")]
+    partial class AddedField
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -106,9 +106,6 @@ namespace Backend.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("ApplicationId")
-                        .HasColumnType("int");
-
                     b.Property<string>("DocumentName")
                         .HasColumnType("nvarchar(max)");
 
@@ -118,14 +115,9 @@ namespace Backend.Migrations
                     b.Property<int?>("InstituteId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ScholarshipApplicationApplicationId")
-                        .HasColumnType("int");
-
                     b.HasKey("DocumentId");
 
                     b.HasIndex("InstituteId");
-
-                    b.HasIndex("ScholarshipApplicationApplicationId");
 
                     b.ToTable("InstituteDocuments");
                 });
@@ -198,6 +190,9 @@ namespace Backend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BoardName12")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CertificateUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ClassStartDate")
@@ -406,15 +401,11 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.InstituteDocument", b =>
                 {
-                    b.HasOne("Backend.Models.Institute", null)
+                    b.HasOne("Backend.Models.Institute", "Institute")
                         .WithMany("InstituteDocument")
                         .HasForeignKey("InstituteId");
 
-                    b.HasOne("Backend.Models.ScholarshipApplication", "ScholarshipApplication")
-                        .WithMany()
-                        .HasForeignKey("ScholarshipApplicationApplicationId");
-
-                    b.Navigation("ScholarshipApplication");
+                    b.Navigation("Institute");
                 });
 
             modelBuilder.Entity("Backend.Models.ScholarshipApplication", b =>

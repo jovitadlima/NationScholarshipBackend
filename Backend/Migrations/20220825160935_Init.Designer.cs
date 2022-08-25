@@ -4,14 +4,16 @@ using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Backend.Migrations
 {
     [DbContext(typeof(ScholarshipDbContext))]
-    partial class ScholarshipDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220825160935_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -188,9 +190,6 @@ namespace Backend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BoardName12")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CertificateUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ClassStartDate")

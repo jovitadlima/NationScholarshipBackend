@@ -50,6 +50,7 @@ namespace Backend.Models
         public bool ApprovedByInstitute { get; set; }
         public bool ApprovedByOfficer { get; set; }
         public bool ApprovedByMinistry { get; set; }
+        public string CertificateUrl { get; set; }
 
 
         // navigation property

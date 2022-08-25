@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Backend.Migrations
 {
-    public partial class InitialClass : Migration
+    public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -108,6 +108,27 @@ namespace Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "InstituteDocuments",
+                columns: table => new
+                {
+                    DocumentId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DocumentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    InstituteId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InstituteDocuments", x => x.DocumentId);
+                    table.ForeignKey(
+                        name: "FK_InstituteDocuments_Institutes_InstituteId",
+                        column: x => x.InstituteId,
+                        principalTable: "Institutes",
+                        principalColumn: "InstituteId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ScholarshipApplications",
                 columns: table => new
                 {
@@ -175,35 +196,6 @@ namespace Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "InstituteDocuments",
-                columns: table => new
-                {
-                    DocumentId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DocumentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DocumentUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ApplicationId = table.Column<int>(type: "int", nullable: false),
-                    ScholarshipApplicationApplicationId = table.Column<int>(type: "int", nullable: true),
-                    InstituteId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_InstituteDocuments", x => x.DocumentId);
-                    table.ForeignKey(
-                        name: "FK_InstituteDocuments_Institutes_InstituteId",
-                        column: x => x.InstituteId,
-                        principalTable: "Institutes",
-                        principalColumn: "InstituteId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_InstituteDocuments_ScholarshipApplications_ScholarshipApplicationApplicationId",
-                        column: x => x.ScholarshipApplicationApplicationId,
-                        principalTable: "ScholarshipApplications",
-                        principalColumn: "ApplicationId",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "StudentDocuments",
                 columns: table => new
                 {
@@ -229,11 +221,6 @@ namespace Backend.Migrations
                 name: "IX_InstituteDocuments_InstituteId",
                 table: "InstituteDocuments",
                 column: "InstituteId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_InstituteDocuments_ScholarshipApplicationApplicationId",
-                table: "InstituteDocuments",
-                column: "ScholarshipApplicationApplicationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ScholarshipApplications_ScholarshipSchemeSchemeId",

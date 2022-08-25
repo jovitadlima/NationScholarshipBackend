@@ -9,8 +9,7 @@ namespace Backend.Models
         public string DocumentName { get; set; }
         public string DocumentUrl { get; set; }
 
-        //reference key
-        public int ApplicationId { get; set; }
-        public ScholarshipApplication ScholarshipApplication { get; set; }
+        //navigation 
+        public Institute Institute { get; set; }
     }
 }
