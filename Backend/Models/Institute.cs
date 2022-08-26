@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Backend.Models
 {
-    public class Institute 
+    public class Institute
     {
         [Key]
         public int InstituteId { get; set; }
@@ -14,7 +14,7 @@ namespace Backend.Models
         public string State { get; set; }
         public string District { get; set; }
         public string InstituteName { get; set; }
-        public int InstituteCode { get; set; }
+        public string InstituteCode { get; set; }
         public string DiseCode { get; set; }
         public string Location { get; set; }
         public string InstituteType { get; set; }
@@ -34,6 +34,7 @@ namespace Backend.Models
         public bool ApprovedByMinistery { get; set; } = false;
 
         // navigation property
+        public ICollection<Student> Student { get; set; }
         public ICollection<InstituteDocument> InstituteDocument { get; set; }
     }
 }

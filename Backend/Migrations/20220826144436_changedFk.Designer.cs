@@ -4,14 +4,16 @@ using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Backend.Migrations
 {
     [DbContext(typeof(ScholarshipDbContext))]
-    partial class ScholarshipDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220826144436_changedFk")]
+    partial class changedFk
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -65,8 +67,8 @@ namespace Backend.Migrations
                     b.Property<int>("InstituteCategory")
                         .HasColumnType("int");
 
-                    b.Property<string>("InstituteCode")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("InstituteCode")
+                        .HasColumnType("int");
 
                     b.Property<string>("InstituteName")
                         .HasColumnType("nvarchar(max)");
@@ -206,9 +208,6 @@ namespace Backend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HouseNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("InstituteCode")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("InstituteName")
@@ -357,7 +356,7 @@ namespace Backend.Migrations
                     b.Property<string>("InstituteCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("InstituteId")
+                    b.Property<int?>("InstituteId")
                         .HasColumnType("int");
 
                     b.Property<string>("PhoneNo")
@@ -432,9 +431,7 @@ namespace Backend.Migrations
                 {
                     b.HasOne("Backend.Models.Institute", "Institute")
                         .WithMany("Student")
-                        .HasForeignKey("InstituteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("InstituteId");
 
                     b.Navigation("Institute");
                 });

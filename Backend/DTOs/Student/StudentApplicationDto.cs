@@ -40,7 +40,6 @@ namespace Backend.DTOs.Student
         public string HouseNumber { get; set; }
         public string StreetNumber { get; set; }
         public int Pincode { get; set; }
-        public int MyProperty { get; set; }
         public string CertificateUrl { get; set; }
         public int StudentId { get; set; }
         public int SchemeId { get; set; }

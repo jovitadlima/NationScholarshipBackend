@@ -46,11 +46,11 @@ namespace Backend.Models
         public string HouseNumber { get; set; }
         public string StreetNumber { get; set; }
         public int Pincode { get; set; }
-        public int MyProperty { get; set; }
         public bool ApprovedByInstitute { get; set; } = false;
         public bool ApprovedByOfficer { get; set; } = false;
         public bool ApprovedByMinistry { get; set; } = false;
         public string CertificateUrl { get; set; }
+        public string InstituteCode { get; set; }
 
 
         // navigation property

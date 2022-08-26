@@ -12,7 +12,7 @@ namespace Backend.Controllers
     [ApiController]
     public class StudentController : ControllerBase
     {
-        private ScholarshipDbContext _context;
+        private readonly ScholarshipDbContext _context;
 
         public StudentController(ScholarshipDbContext context)
         {
@@ -24,15 +24,18 @@ namespace Backend.Controllers
         {
             try
             {
-                var student = _context.Students.ToList();
+                var students = _context.Students.ToList();
 
-                return Ok(student);
+                if (!students.Any()) return NotFound("No Student Present");
+
+
+                return Ok(students);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.InnerException.Message);
             }
-            
+
         }
 
         [HttpGet("{id}")]
@@ -44,6 +47,7 @@ namespace Backend.Controllers
                 return NotFound();
             }
             return Ok(student);
+
         }
 
         [HttpPost("Register")]
@@ -76,11 +80,12 @@ namespace Backend.Controllers
                 {
                     return BadRequest("Failed to create student");
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-            
+
         }
 
         [HttpPost("CreateApplication")]
@@ -126,7 +131,6 @@ namespace Backend.Controllers
                     HouseNumber = studentApplicationDto.HouseNumber,
                     StreetNumber = studentApplicationDto.StreetNumber,
                     Pincode = studentApplicationDto.Pincode,
-                    MyProperty = studentApplicationDto.MyProperty,
                     CertificateUrl = studentApplicationDto.CertificateUrl,
                     StudentId = studentApplicationDto.StudentId,
                     SchemeId = studentApplicationDto.SchemeId
@@ -144,7 +148,7 @@ namespace Backend.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.InnerException.Message);
             }
         }
 
@@ -154,6 +158,8 @@ namespace Backend.Controllers
             try
             {
                 var studentApplications = _context.ScholarshipApplications.ToList();
+
+                if (!studentApplications.Any()) return BadRequest("No Application is present");
 
                 return Ok(studentApplications);
             }

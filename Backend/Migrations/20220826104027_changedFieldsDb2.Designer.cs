@@ -4,14 +4,16 @@ using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Backend.Migrations
 {
     [DbContext(typeof(ScholarshipDbContext))]
-    partial class ScholarshipDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220826104027_changedFieldsDb2")]
+    partial class changedFieldsDb2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -65,8 +67,8 @@ namespace Backend.Migrations
                     b.Property<int>("InstituteCategory")
                         .HasColumnType("int");
 
-                    b.Property<string>("InstituteCode")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("InstituteCode")
+                        .HasColumnType("int");
 
                     b.Property<string>("InstituteName")
                         .HasColumnType("nvarchar(max)");
@@ -206,9 +208,6 @@ namespace Backend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HouseNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("InstituteCode")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("InstituteName")
@@ -357,9 +356,6 @@ namespace Backend.Migrations
                     b.Property<string>("InstituteCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("InstituteId")
-                        .HasColumnType("int");
-
                     b.Property<string>("PhoneNo")
                         .HasColumnType("nvarchar(max)");
 
@@ -370,8 +366,6 @@ namespace Backend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("StudentId");
-
-                    b.HasIndex("InstituteId");
 
                     b.ToTable("Students");
                 });
@@ -428,17 +422,6 @@ namespace Backend.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("Backend.Models.Student", b =>
-                {
-                    b.HasOne("Backend.Models.Institute", "Institute")
-                        .WithMany("Student")
-                        .HasForeignKey("InstituteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Institute");
-                });
-
             modelBuilder.Entity("Backend.Models.StudentDocument", b =>
                 {
                     b.HasOne("Backend.Models.ScholarshipApplication", "ScholarshipApplication")
@@ -451,8 +434,6 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Models.Institute", b =>
                 {
                     b.Navigation("InstituteDocument");
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("Backend.Models.ScholarshipApplication", b =>

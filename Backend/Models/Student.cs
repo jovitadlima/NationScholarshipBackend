@@ -24,6 +24,8 @@ namespace Backend.Models
         public string BankName { get; set; }
 
         // navigation property
+        public int InstituteId { get; set; }
+        public Institute Institute { get; set; }
         public ScholarshipApplication ScholarshipApplication { get; set; }
     }
 }
