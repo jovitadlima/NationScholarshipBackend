@@ -4,14 +4,16 @@ using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Backend.Migrations
 {
     [DbContext(typeof(ScholarshipDbContext))]
-    partial class ScholarshipDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220826044318_ChangedField")]
+    partial class ChangedField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -169,8 +171,8 @@ namespace Backend.Migrations
                     b.Property<int>("AddmissionFee")
                         .HasColumnType("int");
 
-                    b.Property<int>("AnnualIncome")
-                        .HasColumnType("int");
+                    b.Property<double>("AnnualIncome")
+                        .HasColumnType("float");
 
                     b.Property<bool>("ApprovedByInstitute")
                         .HasColumnType("bit");

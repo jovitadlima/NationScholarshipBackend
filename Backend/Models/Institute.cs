@@ -30,8 +30,8 @@ namespace Backend.Models
         public int PrincipalName { get; set; }
         public string MobileNumber { get; set; }
         public string Telephone { get; set; }
-        public bool ApprovedByOfficer { get; set; }
-        public bool ApprovedByMinistery { get; set; }
+        public bool ApprovedByOfficer { get; set; } = false;
+        public bool ApprovedByMinistery { get; set; } = false;
 
         // navigation property
         public ICollection<InstituteDocument> InstituteDocument { get; set; }

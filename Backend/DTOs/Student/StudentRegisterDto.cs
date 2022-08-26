@@ -1,17 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Backend.Models
+namespace Backend.DTOs.Student
 {
-    public class Student
+    public class StudentRegisterDto
     {
-        [Key]
-        public int StudentId { get; set; }
         public string StudentName { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        public string DateOfBirth { get; set; }
         public string Gender { get; set; }
         public string Email { get; set; }
         public string InstituteCode { get; set; }
@@ -22,9 +16,5 @@ namespace Backend.Models
         public string BankIfscCode { get; set; }
         public string BankAccountNumber { get; set; }
         public string BankName { get; set; }
-
-        // navigation property
-        public ScholarshipApplication ScholarshipApplication { get; set; }
     }
 }
-
