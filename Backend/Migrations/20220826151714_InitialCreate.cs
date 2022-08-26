@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Backend.Migrations
 {
-    public partial class Init : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -17,7 +17,7 @@ namespace Backend.Migrations
                     State = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     District = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     InstituteName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    InstituteCode = table.Column<int>(type: "int", nullable: false),
+                    InstituteCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DiseCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     InstituteType = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -84,30 +84,6 @@ namespace Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Students",
-                columns: table => new
-                {
-                    StudentId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    StudentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MyProperty = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    InstituteCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StateOfDomicile = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    District = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AadharNumber = table.Column<int>(type: "int", nullable: false),
-                    BankIfscCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BankAccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Students", x => x.StudentId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "InstituteDocuments",
                 columns: table => new
                 {
@@ -129,6 +105,37 @@ namespace Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Students",
+                columns: table => new
+                {
+                    StudentId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StudentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    InstituteCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StateOfDomicile = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    District = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AadharNumber = table.Column<int>(type: "int", nullable: false),
+                    BankIfscCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BankAccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    InstituteId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Students", x => x.StudentId);
+                    table.ForeignKey(
+                        name: "FK_Students_Institutes_InstituteId",
+                        column: x => x.InstituteId,
+                        principalTable: "Institutes",
+                        principalColumn: "InstituteId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ScholarshipApplications",
                 columns: table => new
                 {
@@ -138,7 +145,7 @@ namespace Backend.Migrations
                     Community = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FatherName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MotherName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AnnualIncome = table.Column<double>(type: "float", nullable: false),
+                    AnnualIncome = table.Column<int>(type: "int", nullable: false),
                     InstituteName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PresentCourse = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PresentCourseYear = table.Column<int>(type: "int", nullable: false),
@@ -170,10 +177,11 @@ namespace Backend.Migrations
                     HouseNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StreetNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Pincode = table.Column<int>(type: "int", nullable: false),
-                    MyProperty = table.Column<int>(type: "int", nullable: false),
                     ApprovedByInstitute = table.Column<bool>(type: "bit", nullable: false),
                     ApprovedByOfficer = table.Column<bool>(type: "bit", nullable: false),
                     ApprovedByMinistry = table.Column<bool>(type: "bit", nullable: false),
+                    CertificateUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    InstituteCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StudentId = table.Column<int>(type: "int", nullable: false),
                     SchemeId = table.Column<int>(type: "int", nullable: false),
                     ScholarshipSchemeSchemeId = table.Column<int>(type: "int", nullable: true)
@@ -237,6 +245,11 @@ namespace Backend.Migrations
                 name: "IX_StudentDocuments_ScholarshipApplicationApplicationId",
                 table: "StudentDocuments",
                 column: "ScholarshipApplicationApplicationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Students_InstituteId",
+                table: "Students",
+                column: "InstituteId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -254,9 +267,6 @@ namespace Backend.Migrations
                 name: "StudentDocuments");
 
             migrationBuilder.DropTable(
-                name: "Institutes");
-
-            migrationBuilder.DropTable(
                 name: "ScholarshipApplications");
 
             migrationBuilder.DropTable(
@@ -264,6 +274,9 @@ namespace Backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "Students");
+
+            migrationBuilder.DropTable(
+                name: "Institutes");
         }
     }
 }

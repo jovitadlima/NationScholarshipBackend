@@ -85,7 +85,6 @@ namespace Backend.Controllers
             {
                 return BadRequest(ex.Message);
             }
-
         }
 
         [HttpPost("CreateApplication")]
