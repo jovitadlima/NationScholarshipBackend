@@ -28,7 +28,6 @@ namespace Backend.Controllers
 
                 if (!students.Any()) return NotFound("No Student Present");
 
-
                 return Ok(students);
             }
             catch (Exception ex)
@@ -42,10 +41,9 @@ namespace Backend.Controllers
         public IActionResult GetStudent(int id)
         {
             var student = _context.Students.Find(id);
-            if (student == null)
-            {
-                return NotFound();
-            }
+
+            if (student == null) return NotFound();
+
             return Ok(student);
 
         }
@@ -70,7 +68,9 @@ namespace Backend.Controllers
                     BankAccountNumber = studentRegisterDto.BankAccountNumber,
                     BankName = studentRegisterDto.BankName,
                 };
+
                 _context.Students.Add(student);
+
                 var result = _context.SaveChanges() > 0;
                 if (result)
                 {
@@ -134,7 +134,9 @@ namespace Backend.Controllers
                     StudentId = studentApplicationDto.StudentId,
                     SchemeId = studentApplicationDto.SchemeId
                 };
+
                 _context.ScholarshipApplications.Add(studentApplication);
+
                 var result = _context.SaveChanges() > 0;
                 if (result)
                 {
@@ -174,10 +176,9 @@ namespace Backend.Controllers
             try
             {
                 var studentApplication = _context.ScholarshipApplications.Find(id);
-                if (studentApplication == null)
-                {
-                    return NotFound();
-                }
+
+                if (studentApplication == null) return NotFound();
+                
                 return Ok(studentApplication);
             }
             catch (Exception ex)

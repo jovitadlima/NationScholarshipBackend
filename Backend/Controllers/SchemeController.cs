@@ -93,6 +93,7 @@ namespace Backend.Controllers
             {
                 var scheme = _context.ScholarshipSchemes.Find(id);
                 _context.ScholarshipSchemes.Remove(scheme);
+
                 var result = _context.SaveChanges() > 0;
                 if (result)
                 {

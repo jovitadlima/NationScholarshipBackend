@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Backend.DTOs.Student;
 using Backend.Models;
 using System;
 using System.Linq;
@@ -10,6 +9,7 @@ namespace Backend.Controllers
     public class OfficerController : Controller
     {
         private ScholarshipDbContext _context;
+
         public OfficerController(ScholarshipDbContext context)
         {
             _context = context;
@@ -20,24 +20,28 @@ namespace Backend.Controllers
         {
             try
             {
-                var institute = _context.Institutes.ToList();
+                var pendingInstitutes = _context.Institutes
+                    .Where(x => !x.ApprovedByOfficer)
+                    .ToList();
 
-                return Ok(institute);
+                if (!pendingInstitutes.Any()) return NotFound("No application pending");
+
+                return Ok(pendingInstitutes);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.InnerException.Message);
             }
         }
 
-        [HttpGet("{id}")]  //To get institutes by id
+        [HttpGet("GetInstitutes/{id}")]  //To get institutes by id
         public IActionResult GetInstitutes(int id)
         {
             var institute = _context.Institutes.Find(id);
-            if (institute == null)
-            {
-                return NotFound();
-            }
+
+            if (institute == null) return NotFound();
+
+
             return Ok(institute);
         }
 
@@ -46,62 +50,79 @@ namespace Backend.Controllers
         {
             try
             {
-                var application = _context.ScholarshipApplications.ToList();
+                var application = _context.ScholarshipApplications
+                    .Where(x => !x.ApprovedByOfficer)
+                    .ToList();
 
                 return Ok(application);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.InnerException.Message);
             }
         }
 
-        [HttpGet("{id}")]  //To get student applications by id
+        [HttpGet("GetApplications/{id}")]  //To get student applications by id
         public IActionResult GetApplications(int id)
         {
-            var application = _context.ScholarshipApplications.Find(id);
-            if (application == null)
+            try
             {
-                return NotFound();
+                var application = _context.ScholarshipApplications.Find(id);
+
+                if (application == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(application);
             }
-            return Ok(application);
+            catch(Exception ex) { 
+                return BadRequest(ex.InnerException.Message);
+            } 
         }
 
         [HttpPost]
         [Route("VerifyInstitute/{id}")]
-        public IActionResult VerifyInstitute(int id, [FromBody] Institute Institute)
+        public IActionResult VerifyInstitute(int id)
         {
             try
             {
-                var institute = _context.Institutes.Where(institute => institute.InstituteId == id).FirstOrDefault();
+                var institute = _context.Institutes
+                    .Where(institute => institute.InstituteId == id)
+                    .FirstOrDefault();
+
                 institute.ApprovedByOfficer = true;
-                _context.SaveChanges();
-                return Ok();
+
+                var result = _context.SaveChanges() > 0;
+
+                return Ok(result);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-
         }
 
         [HttpPost]
         [Route("VerifyApplication/{id}")]
-        public IActionResult VerifyApplication(int id, [FromBody] ScholarshipApplication ScholarshipApplication)
+        public IActionResult VerifyApplication(int id)
         {
             try
             {
-                var application = _context.ScholarshipApplications.Where(application => ScholarshipApplication.ApplicationId == id).FirstOrDefault();
-                application.ApprovedByOfficer = true;
-                _context.SaveChanges();
-                return Ok();
-            }
+                var application = _context.ScholarshipApplications
+                    .Where(application => application.ApplicationId == id)
+                    .FirstOrDefault();
 
+                application.ApprovedByOfficer = true;
+
+                var result = _context.SaveChanges() > 0;
+
+                return Ok(result);
+            }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-
         }
     }
 }
