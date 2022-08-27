@@ -69,6 +69,9 @@ namespace Backend.Controllers
                     BankName = studentRegisterDto.BankName,
                 };
 
+                var institute = _context.Institutes.Where(institute => institute.InstituteCode == student.InstituteCode).FirstOrDefault();
+                student.InstituteId = institute.InstituteId;
+
                 _context.Students.Add(student);
 
                 var result = _context.SaveChanges() > 0;
@@ -132,7 +135,8 @@ namespace Backend.Controllers
                     Pincode = studentApplicationDto.Pincode,
                     CertificateUrl = studentApplicationDto.CertificateUrl,
                     StudentId = studentApplicationDto.StudentId,
-                    SchemeId = studentApplicationDto.SchemeId
+                    SchemeId = studentApplicationDto.SchemeId,
+                    InstituteCode = studentApplicationDto.InstituteCode
                 };
 
                 _context.ScholarshipApplications.Add(studentApplication);

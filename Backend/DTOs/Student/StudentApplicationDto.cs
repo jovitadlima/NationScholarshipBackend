@@ -43,5 +43,6 @@ namespace Backend.DTOs.Student
         public string CertificateUrl { get; set; }
         public int StudentId { get; set; }
         public int SchemeId { get; set; }
+        public string InstituteCode { get; set; }
     }
 }

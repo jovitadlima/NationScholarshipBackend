@@ -10,7 +10,7 @@ namespace Backend.Models
     {
         [Key]
         public int InstituteId { get; set; }
-        public int InstituteCategory { get; set; }
+        public string InstituteCategory { get; set; }
         public string State { get; set; }
         public string District { get; set; }
         public string InstituteName { get; set; }
@@ -27,7 +27,7 @@ namespace Backend.Models
         public string AddressState { get; set; }
         public string AddressDistrict { get; set; }
         public int AddressPincode { get; set; }
-        public int PrincipalName { get; set; }
+        public string PrincipalName { get; set; }
         public string MobileNumber { get; set; }
         public string Telephone { get; set; }
         public bool ApprovedByOfficer { get; set; } = false;

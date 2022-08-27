@@ -47,7 +47,9 @@ namespace Backend.Controllers
                     MobileNumber = _institute.MobileNumber,
                     Telephone = _institute.Telephone
                 };
+
                 _context.Institutes.Add(institute);
+
                 var result = _context.SaveChanges() > 0;
                 if (result)
                 {
@@ -65,7 +67,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
-        [Route("GetAllStudents")]
+        [Route("GetAllStudents/{id}")]
         // all the students in a institute
         public IActionResult GetAllStudents(int id)
         {
@@ -85,7 +87,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
-        [Route("GetAllApplications")]
+        [Route("GetAllApplications/{id}")]
         public IActionResult GetAllApplications(int id)
         {
             try
