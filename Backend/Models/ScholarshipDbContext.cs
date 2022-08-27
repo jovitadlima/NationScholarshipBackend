@@ -20,5 +20,12 @@ namespace Backend.Models
         public DbSet<ScholarshipScheme> ScholarshipSchemes { get; set; }
         public DbSet<InstituteDocument> InstituteDocuments { get; set; }
         public DbSet<StudentDocument> StudentDocuments { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<Institute>().HasIndex(p => new { p.DiseCode, p.InstituteCode }).IsUnique();
+
+            builder.Entity<Student>().HasIndex(p => new { p.AadharNumber, p.PhoneNo, p.BankAccountNumber }).IsUnique();
+        }
     }
 }
