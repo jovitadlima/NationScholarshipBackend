@@ -4,14 +4,16 @@ using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Backend.Migrations
 {
     [DbContext(typeof(ScholarshipDbContext))]
-    partial class ScholarshipDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220827065339_changes3")]
+    partial class changes3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -278,6 +280,9 @@ namespace Backend.Migrations
                     b.Property<int>("SchemeId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ScholarshipSchemeSchemeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("State")
                         .HasColumnType("nvarchar(max)");
 
@@ -298,7 +303,7 @@ namespace Backend.Migrations
 
                     b.HasKey("ApplicationId");
 
-                    b.HasIndex("SchemeId");
+                    b.HasIndex("ScholarshipSchemeSchemeId");
 
                     b.HasIndex("StudentId")
                         .IsUnique();
@@ -420,9 +425,7 @@ namespace Backend.Migrations
                 {
                     b.HasOne("Backend.Models.ScholarshipScheme", "ScholarshipScheme")
                         .WithMany("ScholarshipApplication")
-                        .HasForeignKey("SchemeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ScholarshipSchemeSchemeId");
 
                     b.HasOne("Backend.Models.Student", "Student")
                         .WithOne("ScholarshipApplication")

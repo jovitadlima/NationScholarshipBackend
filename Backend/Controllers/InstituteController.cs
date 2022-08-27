@@ -1,4 +1,5 @@
-﻿using Backend.Models;
+﻿using Backend.DTOs;
+using Backend.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -93,6 +94,7 @@ namespace Backend.Controllers
             try
             {
                 var allapplications = _context.ScholarshipApplications.Include("StudentDocument").ToList();
+                // var allapplications = _context.ScholarshipApplications.ToList();
                 var institute = _context.Institutes.Where(i => i.InstituteId == id).FirstOrDefault();
                 var applications = allapplications.Where(app => app.InstituteCode == institute.InstituteCode);
                 if (applications.Count() == 0)
@@ -142,7 +144,7 @@ namespace Backend.Controllers
 
         [HttpPost]
         [Route("VerifyApplication/{id}")]
-        public IActionResult PostVerifyApplication(int id, bool _approval, [Optional] string _url)
+        public IActionResult PostVerifyApplication(int id, [FromBody] MinistryApprovalDto ministryApprovalDto)
         {
             try
             {
@@ -150,14 +152,11 @@ namespace Backend.Controllers
                 if (application == null)
                     return NotFound("No such application");
 
-                if (_approval == true)
-                {
-                    application.ApprovedByInstitute = _approval;
-                }
+                application.ApprovedByInstitute = ministryApprovalDto.Approval;
 
                 if (application.ApprovedByInstitute)
                 {
-                    application.CertificateUrl = _url;
+                    application.CertificateUrl = ministryApprovalDto.Url;
                     _context.SaveChanges();
                     return Ok("Approved");
                 }

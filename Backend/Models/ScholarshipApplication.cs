@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -57,6 +58,7 @@ namespace Backend.Models
         public int StudentId { get; set; }
         public Student Student { get; set; }
 
+        [ForeignKey("ScholarshipScheme")]
         public int SchemeId { get; set; }
         public ScholarshipScheme ScholarshipScheme { get; set; }
 

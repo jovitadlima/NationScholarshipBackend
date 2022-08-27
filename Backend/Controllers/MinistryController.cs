@@ -61,11 +61,9 @@ namespace Backend.Controllers
         {
             try
             {
-                var institute = _context.Institutes
-                    .Where(institute => institute.InstituteId == id)
-                    .FirstOrDefault();
+                var pendingInstitute = _context.Institutes.Find(id);
 
-                institute.ApprovedByOfficer = true;
+                pendingInstitute.ApprovedByMinistery = true;
 
                 var result = _context.SaveChanges() > 0;
 
@@ -84,11 +82,9 @@ namespace Backend.Controllers
         {
             try
             {
-                var application = _context.ScholarshipApplications
-                    .Where(application => application.ApplicationId == id)
-                    .FirstOrDefault();
+                var application = _context.ScholarshipApplications.Find(id);
 
-                application.ApprovedByOfficer = true;
+                application.ApprovedByMinistry = true;
 
                 var result = _context.SaveChanges() > 0;
 

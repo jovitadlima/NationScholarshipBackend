@@ -34,7 +34,6 @@ namespace Backend.Controllers
             {
                 return BadRequest(ex.InnerException.Message);
             }
-
         }
 
         [HttpGet("{id}")]
@@ -73,6 +72,56 @@ namespace Backend.Controllers
                 student.InstituteId = institute.InstituteId;
 
                 _context.Students.Add(student);
+
+                var result = _context.SaveChanges() > 0;
+                if (result)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest("Failed to create student");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteStudent(int id)
+        {
+            try
+            {
+                var student = _context.Students.Find(id);
+
+                _context.Students.Remove(student);
+
+                var result = _context.SaveChanges() > 0;
+                if (result)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest("Failed to create student");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("DeleteApplication/{id}")]
+        public IActionResult DeleteApplication(int id)
+        {
+            try
+            {
+                var application = _context.ScholarshipApplications.Find(id);
+
+                _context.ScholarshipApplications.Remove(application);
 
                 var result = _context.SaveChanges() > 0;
                 if (result)
@@ -188,6 +237,24 @@ namespace Backend.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("CheckApplicationStatus/{id}")]
+        public IActionResult GetStatus(int id)
+        {
+            try
+            {
+                var application = _context.ScholarshipApplications.Find(id);
+                if (application.ApprovedByOfficer && application.ApprovedByMinistry && application.ApprovedByInstitute)
+                    return Ok("Scholarship Granted");
+                else
+                    return Ok("Status Pending");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.InnerException.Message);
             }
         }
     }
