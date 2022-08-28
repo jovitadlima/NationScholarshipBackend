@@ -13,12 +13,12 @@ namespace Backend.Migrations
                 {
                     InstituteId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    InstituteCategory = table.Column<int>(type: "int", nullable: false),
+                    InstituteCategory = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     State = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     District = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     InstituteName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    InstituteCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DiseCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    InstituteCode = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    DiseCode = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     InstituteType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AffliatedUniversityState = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -30,7 +30,7 @@ namespace Backend.Migrations
                     AddressState = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AddressDistrict = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AddressPincode = table.Column<int>(type: "int", nullable: false),
-                    PrincipalName = table.Column<int>(type: "int", nullable: false),
+                    PrincipalName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MobileNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Telephone = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ApprovedByOfficer = table.Column<bool>(type: "bit", nullable: false),
@@ -115,13 +115,16 @@ namespace Backend.Migrations
                     Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     InstituteCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNo = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     StateOfDomicile = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     District = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AadharNumber = table.Column<int>(type: "int", nullable: false),
+                    AadharNumber = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     BankIfscCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BankAccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BankAccountNumber = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     BankName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PasswordHash = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    PasswordSalt = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    Token = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     InstituteId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -141,7 +144,7 @@ namespace Backend.Migrations
                 {
                     ApplicationId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AadharNumber = table.Column<int>(type: "int", nullable: false),
+                    AadharNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Community = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FatherName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MotherName = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -183,18 +186,17 @@ namespace Backend.Migrations
                     CertificateUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     InstituteCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StudentId = table.Column<int>(type: "int", nullable: false),
-                    SchemeId = table.Column<int>(type: "int", nullable: false),
-                    ScholarshipSchemeSchemeId = table.Column<int>(type: "int", nullable: true)
+                    SchemeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ScholarshipApplications", x => x.ApplicationId);
                     table.ForeignKey(
-                        name: "FK_ScholarshipApplications_ScholarshipSchemes_ScholarshipSchemeSchemeId",
-                        column: x => x.ScholarshipSchemeSchemeId,
+                        name: "FK_ScholarshipApplications_ScholarshipSchemes_SchemeId",
+                        column: x => x.SchemeId,
                         principalTable: "ScholarshipSchemes",
                         principalColumn: "SchemeId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ScholarshipApplications_Students_StudentId",
                         column: x => x.StudentId,
@@ -231,9 +233,16 @@ namespace Backend.Migrations
                 column: "InstituteId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ScholarshipApplications_ScholarshipSchemeSchemeId",
+                name: "IX_Institutes_DiseCode_InstituteCode",
+                table: "Institutes",
+                columns: new[] { "DiseCode", "InstituteCode" },
+                unique: true,
+                filter: "[DiseCode] IS NOT NULL AND [InstituteCode] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ScholarshipApplications_SchemeId",
                 table: "ScholarshipApplications",
-                column: "ScholarshipSchemeSchemeId");
+                column: "SchemeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ScholarshipApplications_StudentId",
@@ -245,6 +254,13 @@ namespace Backend.Migrations
                 name: "IX_StudentDocuments_ScholarshipApplicationApplicationId",
                 table: "StudentDocuments",
                 column: "ScholarshipApplicationApplicationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Students_AadharNumber_PhoneNo_BankAccountNumber",
+                table: "Students",
+                columns: new[] { "AadharNumber", "PhoneNo", "BankAccountNumber" },
+                unique: true,
+                filter: "[AadharNumber] IS NOT NULL AND [PhoneNo] IS NOT NULL AND [BankAccountNumber] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Students_InstituteId",

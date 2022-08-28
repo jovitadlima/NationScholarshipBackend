@@ -5,6 +5,14 @@ using Backend.Models;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Security.Cryptography;
+using System.Security.Claims;
+
+using Microsoft.Extensions.Configuration;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers
 {
@@ -13,38 +21,12 @@ namespace Backend.Controllers
     public class StudentController : ControllerBase
     {
         private readonly ScholarshipDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public StudentController(ScholarshipDbContext context)
+        public StudentController(ScholarshipDbContext context, IConfiguration configuration)
         {
             _context = context;
-        }
-
-        [HttpGet]
-        public IActionResult GetStudents()
-        {
-            try
-            {
-                var students = _context.Students.ToList();
-
-                if (!students.Any()) return NotFound("No Student Present");
-
-                return Ok(students);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.InnerException.Message);
-            }
-        }
-
-        [HttpGet("{id}")]
-        public IActionResult GetStudent(int id)
-        {
-            var student = _context.Students.Find(id);
-
-            if (student == null) return NotFound();
-
-            return Ok(student);
-
+            _configuration = configuration;
         }
 
         [HttpPost("Register")]
@@ -52,23 +34,37 @@ namespace Backend.Controllers
         {
             try
             {
+                if (studentRegisterDto.Password != studentRegisterDto.Password2)
+                {
+                    return BadRequest("Password doest match with confirm password");
+                }
+
+                CreatePasswordHash(studentRegisterDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+
                 var student = new Student()
                 {
                     StudentName = studentRegisterDto.StudentName,
                     DateOfBirth = Convert.ToDateTime(studentRegisterDto.DateOfBirth),
                     Gender = studentRegisterDto.Gender,
                     Email = studentRegisterDto.Email,
+                    AadharNumber = studentRegisterDto.AadharNumber,
                     InstituteCode = studentRegisterDto.InstituteCode,
                     PhoneNo = studentRegisterDto.PhoneNo,
                     StateOfDomicile = studentRegisterDto.StateOfDomicile,
                     District = studentRegisterDto.District,
-                    AadharNumber = studentRegisterDto.AadharNumber,
                     BankIfscCode = studentRegisterDto.BankIfscCode,
                     BankAccountNumber = studentRegisterDto.BankAccountNumber,
                     BankName = studentRegisterDto.BankName,
+                    PasswordHash = passwordHash,
+                    PasswordSalt = passwordSalt
                 };
 
-                var institute = _context.Institutes.Where(institute => institute.InstituteCode == student.InstituteCode).FirstOrDefault();
+                // create institute first
+                var institute = _context.Institutes
+                    .Where(institute => institute.InstituteCode == student.InstituteCode)
+                    .FirstOrDefault();
+
                 student.InstituteId = institute.InstituteId;
 
                 _context.Students.Add(student);
@@ -85,10 +81,101 @@ namespace Backend.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.InnerException.Message);
             }
         }
 
+        [HttpPost("Login")]
+        public ActionResult<string> Login([FromBody] StudentLoginDto studentLoginDto)
+        {
+            try
+            {
+                var studentUser = _context.Students
+                    .Where(student => student.AadharNumber == studentLoginDto.AadharNumber)
+                    .FirstOrDefault();
+
+                if (studentUser == null)
+                {
+                    return NotFound("User not found");
+                }
+
+                if (!VerifyPasswordHash(studentLoginDto.Password, studentUser.PasswordHash, studentUser.PasswordSalt))
+                {
+                    return BadRequest("Wrong password.");
+                }
+
+                string token = GenerateToken(studentUser);
+                return Ok(token);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.InnerException.Message);
+            }
+        }
+
+        private string GenerateToken(Student student)
+        {
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, student.AadharNumber),
+                new Claim(ClaimTypes.Role, "Student")
+            };
+
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+                _configuration.GetSection("AppSettings:Token").Value));
+
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: creds);
+
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return jwt;
+        }
+
+        // Not Required
+        [HttpGet("AllStudents")]
+        public IActionResult GetStudents()
+        {
+            try
+            {
+                var students = _context.Students.ToList();
+
+                if (!students.Any()) return NotFound("No Student Present");
+
+                return Ok(students);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.InnerException.Message);
+            }
+        }
+
+        // Change later remove id
+        [HttpGet]
+        [Authorize(Roles = "Student")]
+        public IActionResult GetStudent()
+        {
+            try
+            {
+                var student = _context.Students
+                    .Where(x => x.AadharNumber == GetStudentAadharNumber())
+                    .FirstOrDefault();
+
+                if (student == null) return NotFound();
+
+                return Ok(student);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.InnerException.Message);
+            }
+        }
+
+        // Remove later, only admin should be able to do this
         [HttpDelete("{id}")]
         public IActionResult DeleteStudent(int id)
         {
@@ -99,14 +186,8 @@ namespace Backend.Controllers
                 _context.Students.Remove(student);
 
                 var result = _context.SaveChanges() > 0;
-                if (result)
-                {
-                    return Ok(result);
-                }
-                else
-                {
-                    return BadRequest("Failed to create student");
-                }
+
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -114,6 +195,7 @@ namespace Backend.Controllers
             }
         }
 
+        // revove this later, only admin should be able to do this
         [HttpDelete("DeleteApplication/{id}")]
         public IActionResult DeleteApplication(int id)
         {
@@ -124,14 +206,8 @@ namespace Backend.Controllers
                 _context.ScholarshipApplications.Remove(application);
 
                 var result = _context.SaveChanges() > 0;
-                if (result)
-                {
-                    return Ok(result);
-                }
-                else
-                {
-                    return BadRequest("Failed to create student");
-                }
+                
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -139,11 +215,27 @@ namespace Backend.Controllers
             }
         }
 
+        // needs to be modified, student id should be taken from jwt token not passed by json request
         [HttpPost("CreateApplication")]
+        [Authorize(Roles = "Student")]
         public IActionResult CreateApplication([FromBody] StudentApplicationDto studentApplicationDto)
         {
             try
             {
+                var student = _context.Students
+                    .Where(x => x.AadharNumber == GetStudentAadharNumber())
+                    .FirstOrDefault();
+
+                if (studentApplicationDto.AadharNumber != GetStudentAadharNumber())
+                {
+                    return BadRequest("Aadhar Number is not eqaul");
+                }
+
+                if (studentApplicationDto.InstituteCode != student.InstituteCode)
+                {
+                    return BadRequest("Institute Code is not equal");
+                }
+
                 var studentApplication = new ScholarshipApplication()
                 {
                     AadharNumber = studentApplicationDto.AadharNumber,
@@ -182,8 +274,7 @@ namespace Backend.Controllers
                     HouseNumber = studentApplicationDto.HouseNumber,
                     StreetNumber = studentApplicationDto.StreetNumber,
                     Pincode = studentApplicationDto.Pincode,
-                    CertificateUrl = studentApplicationDto.CertificateUrl,
-                    StudentId = studentApplicationDto.StudentId,
+                    StudentId = student.StudentId,
                     SchemeId = studentApplicationDto.SchemeId,
                     InstituteCode = studentApplicationDto.InstituteCode
                 };
@@ -191,14 +282,8 @@ namespace Backend.Controllers
                 _context.ScholarshipApplications.Add(studentApplication);
 
                 var result = _context.SaveChanges() > 0;
-                if (result)
-                {
-                    return Ok(result);
-                }
-                else
-                {
-                    return BadRequest("Application Failed");
-                }
+
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -206,7 +291,8 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpGet("GetApplications")]
+        // remove this later
+        [HttpGet("AllApplications")]
         public IActionResult GetApplications()
         {
             try
@@ -223,38 +309,73 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpGet("GetApplication/{id}")]
-        public IActionResult GetApplication(int id)
+        // modify to remove taking id
+        [HttpGet("PendingApplications")]
+        [Authorize(Roles = "Student")]
+        public IActionResult GetApplication()
         {
             try
             {
-                var studentApplication = _context.ScholarshipApplications.Find(id);
+                var pendingStudentApplication = _context.ScholarshipApplications
+                    .Where(x => x.AadharNumber == GetStudentAadharNumber())
+                    .ToList();
 
-                if (studentApplication == null) return NotFound();
+                if (!pendingStudentApplication.Any()) return NotFound();
                 
-                return Ok(studentApplication);
+                return Ok(pendingStudentApplication);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.InnerException.Message);
             }
         }
 
-        [HttpGet]
-        [Route("CheckApplicationStatus/{id}")]
+        [HttpGet("CheckApplicationStatus/{id}")]
+        [Authorize(Roles = "Student")]
         public IActionResult GetStatus(int id)
         {
             try
             {
                 var application = _context.ScholarshipApplications.Find(id);
-                if (application.ApprovedByOfficer && application.ApprovedByMinistry && application.ApprovedByInstitute)
+
+                var instituteApprovalStatus = application.ApprovedByInstitute;
+                var officerApprovalStatus = application.ApprovedByOfficer;
+                var ministryApprovalStatus = application.ApprovedByMinistry;
+
+                if (instituteApprovalStatus && officerApprovalStatus && ministryApprovalStatus)
+                {
                     return Ok("Scholarship Granted");
+                }
                 else
-                    return Ok("Status Pending");
+                {
+                    return BadRequest("Status Pending");
+                }
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.InnerException.Message);
+            }
+        }
+
+        private string GetStudentAadharNumber()
+        {
+            return User?.Identity?.Name;
+        }
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
+        }
+
+        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512(passwordSalt))
+            {
+                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return computedHash.SequenceEqual(passwordHash);
             }
         }
     }

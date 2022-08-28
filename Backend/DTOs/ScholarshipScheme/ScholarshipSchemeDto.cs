@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Backend.DTOs
+namespace Backend.DTOs.ScholarshipScheme
 {
     public class ScholarshipSchemeDto
     {

@@ -11,7 +11,7 @@ namespace Backend.Models
     {
         [Key]
         public int ApplicationId { get; set; }
-        public int AadharNumber { get; set; }
+        public string AadharNumber { get; set; }
         public string Community { get; set; }
         public string FatherName { get; set; }
         public string MotherName { get; set; }

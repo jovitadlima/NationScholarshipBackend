@@ -4,7 +4,7 @@ namespace Backend.DTOs.Student
 {
     public class StudentApplicationDto
     {
-        public int AadharNumber { get; set; }
+        public string AadharNumber { get; set; }
         public string Community { get; set; }
         public string FatherName { get; set; }
         public string MotherName { get; set; }
@@ -40,8 +40,6 @@ namespace Backend.DTOs.Student
         public string HouseNumber { get; set; }
         public string StreetNumber { get; set; }
         public int Pincode { get; set; }
-        public string CertificateUrl { get; set; }
-        public int StudentId { get; set; }
         public int SchemeId { get; set; }
         public string InstituteCode { get; set; }
     }

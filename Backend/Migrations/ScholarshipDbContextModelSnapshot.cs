@@ -50,7 +50,7 @@ namespace Backend.Migrations
                     b.Property<string>("AffliatedUniversityState")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("ApprovedByMinistery")
+                    b.Property<bool>("ApprovedByMinistry")
                         .HasColumnType("bit");
 
                     b.Property<bool>("ApprovedByOfficer")
@@ -79,6 +79,12 @@ namespace Backend.Migrations
 
                     b.Property<string>("MobileNumber")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("PasswordHash")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("PrincipalName")
                         .HasColumnType("nvarchar(max)");
@@ -137,6 +143,12 @@ namespace Backend.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("PasswordHash")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .HasColumnType("varbinary(max)");
+
                     b.HasKey("MinistryId");
 
                     b.ToTable("Ministries");
@@ -155,6 +167,12 @@ namespace Backend.Migrations
                     b.Property<string>("OfficerName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("PasswordHash")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .HasColumnType("varbinary(max)");
+
                     b.HasKey("OfficerId");
 
                     b.ToTable("NodalOfficers");
@@ -167,8 +185,8 @@ namespace Backend.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("AadharNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("AadharNumber")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("AddmissionFee")
                         .HasColumnType("int");
@@ -331,8 +349,8 @@ namespace Backend.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("AadharNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("AadharNumber")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("BankAccountNumber")
                         .HasColumnType("nvarchar(450)");
@@ -361,6 +379,12 @@ namespace Backend.Migrations
                     b.Property<int>("InstituteId")
                         .HasColumnType("int");
 
+                    b.Property<byte[]>("PasswordHash")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<string>("PhoneNo")
                         .HasColumnType("nvarchar(450)");
 
@@ -376,7 +400,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("AadharNumber", "PhoneNo", "BankAccountNumber")
                         .IsUnique()
-                        .HasFilter("[PhoneNo] IS NOT NULL AND [BankAccountNumber] IS NOT NULL");
+                        .HasFilter("[AadharNumber] IS NOT NULL AND [PhoneNo] IS NOT NULL AND [BankAccountNumber] IS NOT NULL");
 
                     b.ToTable("Students");
                 });

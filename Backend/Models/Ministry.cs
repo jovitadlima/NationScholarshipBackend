@@ -12,5 +12,8 @@ namespace Backend.Models
         public int MinistryId { get; set; }
         public string Name { get; set; }
         public string MinistryEmail { get; set; }
+
+        public byte[] PasswordHash { get; set; }
+        public byte[] PasswordSalt { get; set; }
     }
 }

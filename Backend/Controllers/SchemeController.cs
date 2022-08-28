@@ -4,7 +4,8 @@ using Backend.Models;
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using Backend.DTOs;
+using Backend.DTOs.ScholarshipScheme;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers
 {
@@ -31,7 +32,14 @@ namespace Backend.Controllers
                     return NotFound("No Scheme Present");
                 }
 
-                return Ok(schemes);
+                var schemesDto = schemes.Select(x => new SchemeResponseDto
+                {
+                    SchemeId = x.SchemeId,
+                    Name = x.Name,
+                    Description = x.Description
+                });
+
+                return Ok(schemesDto);
             }
             catch (Exception ex)
             {
@@ -51,7 +59,12 @@ namespace Backend.Controllers
                     return NotFound("Scheme not present");
                 }
 
-                return Ok(scheme);
+                return Ok(new SchemeResponseDto
+                {
+                    SchemeId = scheme.SchemeId,
+                    Name = scheme.Name,
+                    Description = scheme.Description
+                });
             }
             catch (Exception ex)
             {

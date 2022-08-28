@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Backend.DTOs
+namespace Backend.DTOs.Institute
 {
-    public class MinistryApprovalDto
+    public class InstituteApprovalDto
     {
         public bool Approval { get; set; }
         public string Url { get; set; }

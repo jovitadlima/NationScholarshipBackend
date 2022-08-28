@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ScholarshipDbContext))]
-    [Migration("20220827053956_addedcontraints")]
-    partial class addedcontraints
+    [Migration("20220828085901_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -64,8 +64,8 @@ namespace Backend.Migrations
                     b.Property<string>("District")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("InstituteCategory")
-                        .HasColumnType("int");
+                    b.Property<string>("InstituteCategory")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("InstituteCode")
                         .HasColumnType("nvarchar(450)");
@@ -82,8 +82,8 @@ namespace Backend.Migrations
                     b.Property<string>("MobileNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PrincipalName")
-                        .HasColumnType("int");
+                    b.Property<string>("PrincipalName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("State")
                         .HasColumnType("nvarchar(max)");
@@ -169,8 +169,8 @@ namespace Backend.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("AadharNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("AadharNumber")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("AddmissionFee")
                         .HasColumnType("int");
@@ -280,9 +280,6 @@ namespace Backend.Migrations
                     b.Property<int>("SchemeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ScholarshipSchemeSchemeId")
-                        .HasColumnType("int");
-
                     b.Property<string>("State")
                         .HasColumnType("nvarchar(max)");
 
@@ -303,7 +300,7 @@ namespace Backend.Migrations
 
                     b.HasKey("ApplicationId");
 
-                    b.HasIndex("ScholarshipSchemeSchemeId");
+                    b.HasIndex("SchemeId");
 
                     b.HasIndex("StudentId")
                         .IsUnique();
@@ -336,8 +333,8 @@ namespace Backend.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("AadharNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("AadharNumber")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("BankAccountNumber")
                         .HasColumnType("nvarchar(450)");
@@ -366,6 +363,12 @@ namespace Backend.Migrations
                     b.Property<int>("InstituteId")
                         .HasColumnType("int");
 
+                    b.Property<byte[]>("PasswordHash")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<string>("PhoneNo")
                         .HasColumnType("nvarchar(450)");
 
@@ -375,13 +378,16 @@ namespace Backend.Migrations
                     b.Property<string>("StudentName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Token")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("StudentId");
 
                     b.HasIndex("InstituteId");
 
                     b.HasIndex("AadharNumber", "PhoneNo", "BankAccountNumber")
                         .IsUnique()
-                        .HasFilter("[PhoneNo] IS NOT NULL AND [BankAccountNumber] IS NOT NULL");
+                        .HasFilter("[AadharNumber] IS NOT NULL AND [PhoneNo] IS NOT NULL AND [BankAccountNumber] IS NOT NULL");
 
                     b.ToTable("Students");
                 });
@@ -425,7 +431,9 @@ namespace Backend.Migrations
                 {
                     b.HasOne("Backend.Models.ScholarshipScheme", "ScholarshipScheme")
                         .WithMany("ScholarshipApplication")
-                        .HasForeignKey("ScholarshipSchemeSchemeId");
+                        .HasForeignKey("SchemeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Backend.Models.Student", "Student")
                         .WithOne("ScholarshipApplication")

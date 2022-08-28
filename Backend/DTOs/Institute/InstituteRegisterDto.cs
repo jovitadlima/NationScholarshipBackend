@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Backend.Models
+namespace Backend.DTOs.Institute
 {
-    public class Institute
+    public class InstituteRegisterDto
     {
-        [Key]
-        public int InstituteId { get; set; }
         public string InstituteCategory { get; set; }
         public string State { get; set; }
         public string District { get; set; }
@@ -30,14 +24,8 @@ namespace Backend.Models
         public string PrincipalName { get; set; }
         public string MobileNumber { get; set; }
         public string Telephone { get; set; }
-        public bool ApprovedByOfficer { get; set; } = false;
-        public bool ApprovedByMinistry { get; set; } = false;
 
-        public byte[] PasswordHash { get; set; }
-        public byte[] PasswordSalt { get; set; }
-
-        // navigation property
-        public ICollection<Student> Student { get; set; }
-        public ICollection<InstituteDocument> InstituteDocument { get; set; }
+        public string Password { get; set; }
+        public string Password2 { get; set; }
     }
 }

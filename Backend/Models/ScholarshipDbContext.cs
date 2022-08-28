@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Backend.Models
 {
-    public class ScholarshipDbContext: DbContext
+    public class ScholarshipDbContext : DbContext
     {
         public ScholarshipDbContext(DbContextOptions<ScholarshipDbContext> options): base(options) 
         {

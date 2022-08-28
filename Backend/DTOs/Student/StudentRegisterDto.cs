@@ -12,9 +12,11 @@ namespace Backend.DTOs.Student
         public string PhoneNo { get; set; }
         public string StateOfDomicile { get; set; }
         public string District { get; set; }
-        public int AadharNumber { get; set; }
+        public string AadharNumber { get; set; }
         public string BankIfscCode { get; set; }
         public string BankAccountNumber { get; set; }
         public string BankName { get; set; }
+        public string Password { get; set; }
+        public string Password2 { get; set; }
     }
 }
