@@ -31,8 +31,7 @@ namespace Backend.Controllers
 
         [HttpPost]
         [Route("Register")]
-        public IActionResult Register([FromForm] IFormFile file1, [FromForm] IFormFile file2,
-            [FromForm] InstituteRegisterDto instituteRegisterDto)
+        public IActionResult Register([FromBody] InstituteRegisterDto instituteRegisterDto)
         {
             try
             {
@@ -68,24 +67,6 @@ namespace Backend.Controllers
                     PasswordHash = passwordHash,
                     PasswordSalt = passwordSalt
                 };
-
-                string directoryPath = @"D:\Document_Project\InstituteDocument\" + institute.InstituteCode;
-                if (!Directory.Exists(directoryPath))
-                {
-                    Directory.CreateDirectory(directoryPath);
-                }
-                string filepath1 = Path.Combine(directoryPath, file1.FileName);
-                string filepath2 = Path.Combine(directoryPath, file2.FileName);
-                using (var stream = new FileStream(filepath1, FileMode.Create))
-                {
-                    file1.CopyTo(stream);
-                }
-                using (var stream = new FileStream(filepath2, FileMode.Create))
-                {
-                    file2.CopyTo(stream);
-                }
-                institute.RegistrationCertificate = filepath1;
-                institute.UniversityAffliationCertificate = filepath2;
 
                 _context.Institutes.Add(institute);
 
@@ -125,7 +106,7 @@ namespace Backend.Controllers
                 }
 
                 string token = GenerateToken(instituteUser);
-                return Ok(token);
+                return Ok(new { Token = token });
             }
             catch (Exception ex)
             {
@@ -184,19 +165,31 @@ namespace Backend.Controllers
         {
             try
             {
-                var institute = _context.Institutes
-                    .Where(x => x.InstituteCode == GetInstituteCode())
-                    .FirstOrDefault();
-
-                int instId = institute.InstituteId;
-
                 var students = _context.Students
-                    .Where(x => x.InstituteId == instId)
+                    .Where(x => x.InstituteCode == GetInstituteCode())
                     .ToList();
 
                 if (!students.Any()) return NotFound("No Students");
 
                 return Ok(students);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.InnerException.Message);
+            }
+        }
+
+        // Not Required
+        [HttpGet("AllInstitutes")]
+        public IActionResult GetAllInstitutes()
+        {
+            try
+            {
+                var institutes = _context.Institutes.ToList();
+
+                if (!institutes.Any()) return NotFound("No Student Present");
+
+                return Ok(institutes);
             }
             catch (Exception ex)
             {
@@ -279,7 +272,7 @@ namespace Backend.Controllers
 
         [HttpPost("VerifyPendingApplication/{id}")]
         [Authorize(Roles = "Institute")]
-        public IActionResult PostVerifyApplication(int id, IFormFile file)
+        public IActionResult PostVerifyApplication(int id, InstituteApprovalDto instituteApprovalDto)
         {
             try
             {
@@ -298,18 +291,8 @@ namespace Backend.Controllers
 
                 if (application.ApprovedByInstitute)
                 {
-                    string directorypath = @"D:/Certificates-Bonafide/" + application.StudentId;
-                    if (!Directory.Exists(directorypath))
-                    {
-                        Directory.CreateDirectory(directorypath);
-                    }
-                    string filepath = Path.Combine(directorypath, file.FileName);
-                    using (var stream = new FileStream(filepath, FileMode.Create))
-                    {
-                        file.CopyTo(stream);
-                    }
 
-                    application.CertificateUrl = filepath;
+                    application.CertificateUrl = instituteApprovalDto.Url;
 
                     _context.SaveChanges();
                     return Ok("Approved");

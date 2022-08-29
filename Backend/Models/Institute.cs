@@ -20,21 +20,21 @@ namespace Backend.Models
         public string InstituteType { get; set; }
         public string AffliatedUniversityState { get; set; }
         public string AffliatedUniversityName { get; set; }
-        public int YearOfAddmission { get; set; }
+        public string YearOfAddmission { get; set; }
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }
         public string AddressCity { get; set; }
         public string AddressState { get; set; }
         public string AddressDistrict { get; set; }
-        public int AddressPincode { get; set; }
+        public string AddressPincode { get; set; }
         public string PrincipalName { get; set; }
         public string MobileNumber { get; set; }
         public string Telephone { get; set; }
         public bool ApprovedByOfficer { get; set; } = false;
         public bool ApprovedByMinistry { get; set; } = false;
         public bool IsRejected { get; set; } = false;
-        public string RegistrationCertificate { get; set; }
-        public string UniversityAffliationCertificate { get; set; }
+        public string RegistrationCertificate { get; set; } = string.Empty;
+        public string UniversityAffliationCertificate { get; set; } = string.Empty;
 
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }

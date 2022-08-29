@@ -46,7 +46,7 @@ namespace Backend.Controllers
                 var student = new Student()
                 {
                     StudentName = studentRegisterDto.StudentName,
-                    DateOfBirth = Convert.ToDateTime(studentRegisterDto.DateOfBirth),
+                    DateOfBirth = studentRegisterDto.DateOfBirth,
                     Gender = studentRegisterDto.Gender,
                     Email = studentRegisterDto.Email,
                     AadharNumber = studentRegisterDto.AadharNumber,
@@ -63,7 +63,7 @@ namespace Backend.Controllers
 
                 // create institute first
                 var institute = _context.Institutes
-                    .Where(institute => institute.InstituteCode == student.InstituteCode)
+                    .Where(x => x.InstituteCode == student.InstituteCode)
                     .FirstOrDefault();
 
                 student.InstituteId = institute.InstituteId;
@@ -87,7 +87,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost("Login")]
-        public ActionResult<string> Login([FromBody] StudentLoginDto studentLoginDto)
+        public ActionResult Login([FromBody] StudentLoginDto studentLoginDto)
         {
             try
             {
@@ -106,7 +106,7 @@ namespace Backend.Controllers
                 }
 
                 string token = GenerateToken(studentUser);
-                return Ok(token);
+                return Ok(new { Token = token });
             }
             catch (Exception ex)
             {
@@ -170,7 +170,7 @@ namespace Backend.Controllers
 
                 return Ok(student);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.InnerException.Message);
             }
@@ -207,7 +207,7 @@ namespace Backend.Controllers
                 _context.ScholarshipApplications.Remove(application);
 
                 var result = _context.SaveChanges() > 0;
-                
+
                 return Ok(result);
             }
             catch (Exception ex)
@@ -219,8 +219,7 @@ namespace Backend.Controllers
         // needs to be modified, student id should be taken from jwt token not passed by json request
         [HttpPost("CreateApplication")]
         [Authorize(Roles = "Student")]
-        public IActionResult CreateApplication([FromForm] IFormFile file1, [FromForm] IFormFile file2, [FromForm] IFormFile file3, [FromForm] IFormFile file4, [FromForm] IFormFile file5, [FromForm] IFormFile file6, [FromForm] IFormFile file7, [FromForm] IFormFile file8, [FromForm] IFormFile file9, [FromForm] IFormFile file10,
-            [FromForm] StudentApplicationDto studentApplicationDto)
+        public IActionResult CreateApplication([FromBody] StudentApplicationDto studentApplicationDto)
         {
             try
             {
@@ -242,6 +241,7 @@ namespace Backend.Controllers
                 {
                     AadharNumber = studentApplicationDto.AadharNumber,
                     Community = studentApplicationDto.Community,
+                    Religion = studentApplicationDto.Religion,
                     FatherName = studentApplicationDto.FatherName,
                     MotherName = studentApplicationDto.MotherName,
                     AnnualIncome = studentApplicationDto.AnnualIncome,
@@ -249,7 +249,7 @@ namespace Backend.Controllers
                     PresentCourse = studentApplicationDto.PresentCourse,
                     PresentCourseYear = studentApplicationDto.PresentCourseYear,
                     ModeOfStudy = studentApplicationDto.ModeOfStudy,
-                    ClassStartDate = Convert.ToDateTime(studentApplicationDto.ClassStartDate),
+                    ClassStartDate = studentApplicationDto.ClassStartDate,
                     UniversityBoardName = studentApplicationDto.UniversityBoardName,
                     PreviousCourse = studentApplicationDto.PreviousCourse,
                     PreviousPassingYear = studentApplicationDto.PreviousPassingYear,
@@ -277,83 +277,15 @@ namespace Backend.Controllers
                     StreetNumber = studentApplicationDto.StreetNumber,
                     Pincode = studentApplicationDto.Pincode,
                     StudentId = student.StudentId,
-                    SchemeId = studentApplicationDto.SchemeId,
+                    SchemeId = Convert.ToInt32(studentApplicationDto.SchemeId),
                     InstituteCode = studentApplicationDto.InstituteCode
                 };
-
-                string directoryPath = @"D:\Document_Project\ScholarshipApplicationDocuments\" + GetStudentAadharNumber();
-                if (!Directory.Exists(directoryPath))
-                {
-                    Directory.CreateDirectory(directoryPath);
-                }
-                string filepath1 = Path.Combine(directoryPath, file1.FileName);
-                string filepath2 = Path.Combine(directoryPath, file2.FileName);
-                string filepath3 = Path.Combine(directoryPath, file3.FileName);
-                string filepath4 = Path.Combine(directoryPath, file4.FileName);
-                string filepath5 = Path.Combine(directoryPath, file5.FileName);
-                string filepath6 = Path.Combine(directoryPath, file6.FileName);
-                string filepath7 = Path.Combine(directoryPath, file7.FileName);
-                string filepath8 = Path.Combine(directoryPath, file8.FileName);
-                string filepath9 = Path.Combine(directoryPath, file9.FileName);
-                string filepath10 = Path.Combine(directoryPath, file10.FileName);
-                using (var stream = new FileStream(filepath1, FileMode.Create))
-                {
-                    file1.CopyTo(stream);
-                }
-                using (var stream = new FileStream(filepath2, FileMode.Create))
-                {
-                    file2.CopyTo(stream);
-                }
-                using (var stream = new FileStream(filepath3, FileMode.Create))
-                {
-                    file3.CopyTo(stream);
-                }
-                using (var stream = new FileStream(filepath4, FileMode.Create))
-                {
-                    file4.CopyTo(stream);
-                }
-                using (var stream = new FileStream(filepath5, FileMode.Create))
-                {
-                    file5.CopyTo(stream);
-                }
-                using (var stream = new FileStream(filepath6, FileMode.Create))
-                {
-                    file6.CopyTo(stream);
-                }
-                using (var stream = new FileStream(filepath7, FileMode.Create))
-                {
-                    file7.CopyTo(stream);
-                }
-                using (var stream = new FileStream(filepath8, FileMode.Create))
-                {
-                    file8.CopyTo(stream);
-                }
-                using (var stream = new FileStream(filepath9, FileMode.Create))
-                {
-                    file9.CopyTo(stream);
-                }
-                using (var stream = new FileStream(filepath10, FileMode.Create))
-                {
-                    file10.CopyTo(stream);
-                }
-
-                studentApplication.DomicileCertificate = filepath1;
-                studentApplication.Photo = filepath2;
-                studentApplication.InstituteIdCard = filepath3;
-                studentApplication.CasteOrIncomeCertificate = filepath4;
-                studentApplication.PreviousYearMarksheet = filepath5;
-                studentApplication.FeeReceiptOfCurrentYear = filepath6;
-                studentApplication.BankPassBook = filepath7;
-                studentApplication.AadharCard = filepath8;
-                studentApplication._10thMarkSheet = filepath9;
-                studentApplication._12thMarkSheet = filepath10;
-
 
                 _context.ScholarshipApplications.Add(studentApplication);
 
                 var result = _context.SaveChanges() > 0;
 
-                return Ok(result);
+                return Ok(new { Result = result });
             }
             catch (Exception ex)
             {
@@ -390,8 +322,8 @@ namespace Backend.Controllers
                     .Where(x => x.AadharNumber == GetStudentAadharNumber())
                     .ToList();
 
-                if (!pendingStudentApplication.Any()) return NotFound();
-                
+                if (!pendingStudentApplication.Any()) return NotFound(new { Message = "No Application Pending" });
+
                 return Ok(pendingStudentApplication);
             }
             catch (Exception ex)
@@ -408,18 +340,15 @@ namespace Backend.Controllers
             {
                 var application = _context.ScholarshipApplications.Find(id);
 
+                if (application == null) return NotFound(new { Message = "Application not found" });
+
                 var instituteApprovalStatus = application.ApprovedByInstitute;
                 var officerApprovalStatus = application.ApprovedByOfficer;
                 var ministryApprovalStatus = application.ApprovedByMinistry;
 
-                if (instituteApprovalStatus && officerApprovalStatus && ministryApprovalStatus)
-                {
-                    return Ok("Scholarship Granted");
-                }
-                else
-                {
-                    return BadRequest("Status Pending");
-                }
+                bool status = instituteApprovalStatus && officerApprovalStatus && ministryApprovalStatus;
+
+                return Ok(new { Application = application, Status = status });
             }
             catch (Exception ex)
             {

@@ -46,7 +46,7 @@ namespace Backend.Controllers
                 }
 
                 string token = GenerateToken(ministryUser);
-                return Ok(token);
+                return Ok(new { Token = token });
             }
             catch (Exception ex)
             {

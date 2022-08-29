@@ -25,7 +25,7 @@ namespace Backend.Models
                     OfficerName = "Officer",
                     OfficerEmail = "officer@nsp.com",
                     PasswordHash = CreatePasswordHash("opassword"),
-                    PasswordSalt = CreatePasswordSalt("0password")
+                    PasswordSalt = CreatePasswordSalt("opassword")
                 }
             );
         }

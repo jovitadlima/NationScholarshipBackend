@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ScholarshipDbContext))]
-    [Migration("20220829033542_seed")]
-    partial class seed
+    [Migration("20220829104257_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -40,8 +40,8 @@ namespace Backend.Migrations
                     b.Property<string>("AddressLine2")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("AddressPincode")
-                        .HasColumnType("int");
+                    b.Property<string>("AddressPincode")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AddressState")
                         .HasColumnType("nvarchar(max)");
@@ -76,6 +76,9 @@ namespace Backend.Migrations
                     b.Property<string>("InstituteType")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsRejected")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Location")
                         .HasColumnType("nvarchar(max)");
 
@@ -91,14 +94,20 @@ namespace Backend.Migrations
                     b.Property<string>("PrincipalName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("RegistrationCertificate")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("State")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Telephone")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("YearOfAddmission")
-                        .HasColumnType("int");
+                    b.Property<string>("UniversityAffliationCertificate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("YearOfAddmission")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("InstituteId");
 
@@ -107,29 +116,6 @@ namespace Backend.Migrations
                         .HasFilter("[DiseCode] IS NOT NULL AND [InstituteCode] IS NOT NULL");
 
                     b.ToTable("Institutes");
-                });
-
-            modelBuilder.Entity("Backend.Models.InstituteDocument", b =>
-                {
-                    b.Property<int>("DocumentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("DocumentName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DocumentUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("InstituteId")
-                        .HasColumnType("int");
-
-                    b.HasKey("DocumentId");
-
-                    b.HasIndex("InstituteId");
-
-                    b.ToTable("InstituteDocuments");
                 });
 
             modelBuilder.Entity("Backend.Models.Ministry", b =>
@@ -161,8 +147,8 @@ namespace Backend.Migrations
                             MinistryId = 1,
                             MinistryEmail = "ministry@nsp.com",
                             Name = "Ministry",
-                            PasswordHash = new byte[] { 130, 16, 99, 84, 111, 254, 136, 23, 139, 157, 53, 247, 17, 126, 19, 58, 194, 230, 233, 56, 218, 141, 79, 36, 231, 16, 96, 188, 157, 35, 192, 147, 149, 81, 83, 193, 130, 195, 20, 193, 88, 224, 64, 166, 149, 56, 17, 220, 149, 204, 202, 97, 55, 176, 120, 232, 85, 113, 65, 8, 167, 199, 106, 28 },
-                            PasswordSalt = new byte[] { 116, 156, 222, 38, 110, 137, 76, 88, 233, 45, 118, 230, 239, 204, 155, 120, 44, 167, 171, 44, 119, 194, 109, 220, 12, 138, 221, 100, 180, 245, 241, 6, 180, 32, 124, 57, 145, 95, 199, 201, 78, 43, 203, 180, 150, 166, 17, 120, 140, 207, 150, 222, 55, 116, 223, 114, 86, 133, 44, 171, 60, 152, 13, 31, 5, 35, 167, 215, 32, 195, 79, 158, 35, 167, 84, 79, 118, 22, 150, 191, 76, 118, 123, 30, 113, 23, 78, 63, 159, 13, 100, 81, 93, 40, 149, 251, 193, 162, 99, 31, 150, 137, 173, 57, 149, 8, 252, 240, 94, 203, 46, 168, 68, 133, 147, 169, 137, 207, 209, 107, 177, 93, 164, 29, 125, 193, 167, 72 }
+                            PasswordHash = new byte[] { 117, 28, 197, 232, 63, 111, 70, 221, 248, 248, 104, 118, 159, 254, 216, 76, 174, 197, 180, 224, 65, 233, 68, 59, 177, 123, 26, 45, 175, 122, 0, 202, 79, 27, 114, 152, 148, 166, 130, 43, 55, 168, 85, 243, 24, 100, 62, 98, 235, 13, 110, 96, 155, 157, 230, 203, 179, 161, 113, 180, 53, 40, 103, 26 },
+                            PasswordSalt = new byte[] { 170, 94, 193, 71, 179, 92, 219, 193, 229, 242, 12, 93, 181, 243, 164, 75, 240, 172, 230, 96, 27, 234, 10, 51, 86, 53, 95, 238, 138, 244, 55, 121, 9, 184, 71, 123, 208, 113, 14, 62, 92, 43, 6, 171, 92, 196, 253, 1, 137, 51, 173, 12, 0, 4, 77, 145, 113, 219, 47, 21, 28, 179, 233, 142, 244, 116, 163, 125, 195, 71, 157, 164, 240, 249, 246, 75, 150, 22, 101, 129, 45, 173, 220, 44, 226, 242, 53, 134, 82, 1, 184, 205, 92, 78, 106, 137, 237, 190, 217, 122, 212, 90, 59, 2, 153, 127, 43, 195, 223, 64, 225, 106, 31, 139, 19, 60, 36, 80, 39, 245, 103, 233, 99, 110, 43, 98, 61, 20 }
                         });
                 });
 
@@ -195,8 +181,8 @@ namespace Backend.Migrations
                             OfficerId = 1,
                             OfficerEmail = "officer@nsp.com",
                             OfficerName = "Officer",
-                            PasswordHash = new byte[] { 188, 97, 234, 172, 24, 171, 225, 41, 188, 216, 143, 224, 235, 55, 182, 49, 189, 82, 75, 65, 226, 154, 209, 66, 26, 76, 216, 70, 97, 7, 73, 207, 61, 116, 32, 132, 232, 71, 87, 95, 61, 234, 51, 19, 11, 26, 124, 159, 176, 199, 17, 245, 209, 133, 25, 127, 145, 206, 197, 209, 49, 114, 10, 62 },
-                            PasswordSalt = new byte[] { 196, 85, 173, 121, 50, 94, 72, 121, 157, 196, 171, 213, 20, 59, 213, 73, 189, 62, 234, 2, 75, 226, 35, 200, 87, 249, 92, 90, 117, 161, 65, 113, 11, 32, 86, 125, 119, 249, 193, 183, 11, 80, 214, 6, 10, 82, 187, 166, 153, 48, 115, 96, 240, 194, 186, 163, 212, 17, 220, 102, 95, 142, 227, 2, 210, 121, 234, 44, 230, 177, 101, 88, 5, 199, 170, 195, 76, 127, 33, 49, 95, 201, 200, 204, 217, 141, 237, 195, 11, 231, 171, 220, 150, 51, 230, 249, 149, 221, 112, 250, 136, 150, 203, 124, 157, 118, 5, 87, 4, 248, 193, 226, 3, 17, 13, 119, 245, 137, 55, 81, 157, 106, 253, 81, 87, 66, 226, 143 }
+                            PasswordHash = new byte[] { 15, 255, 122, 79, 71, 153, 99, 51, 26, 186, 244, 143, 160, 5, 25, 184, 8, 27, 132, 155, 46, 80, 214, 139, 198, 132, 43, 143, 193, 50, 205, 17, 154, 222, 1, 54, 197, 49, 247, 167, 107, 64, 128, 215, 245, 61, 157, 147, 148, 200, 250, 36, 119, 253, 199, 217, 200, 162, 249, 17, 15, 159, 74, 128 },
+                            PasswordSalt = new byte[] { 82, 198, 153, 101, 101, 130, 133, 201, 210, 134, 11, 83, 222, 37, 47, 155, 0, 191, 45, 206, 169, 250, 186, 193, 102, 168, 254, 34, 156, 186, 51, 31, 235, 239, 161, 180, 169, 203, 212, 121, 200, 16, 163, 52, 184, 37, 152, 113, 112, 71, 183, 202, 40, 248, 48, 77, 204, 120, 202, 162, 150, 37, 113, 27, 42, 206, 45, 120, 107, 146, 223, 198, 74, 18, 216, 133, 231, 139, 251, 121, 111, 69, 221, 136, 18, 42, 246, 202, 155, 4, 208, 3, 149, 38, 113, 92, 123, 181, 199, 92, 5, 98, 32, 4, 201, 20, 26, 5, 116, 191, 181, 129, 47, 60, 145, 177, 53, 155, 69, 217, 126, 4, 240, 71, 85, 32, 142, 20 }
                         });
                 });
 
@@ -207,14 +193,17 @@ namespace Backend.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("AadharCard")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("AadharNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("AddmissionFee")
                         .HasColumnType("int");
 
-                    b.Property<int>("AnnualIncome")
-                        .HasColumnType("int");
+                    b.Property<string>("AnnualIncome")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("ApprovedByInstitute")
                         .HasColumnType("bit");
@@ -225,6 +214,9 @@ namespace Backend.Migrations
                     b.Property<bool>("ApprovedByOfficer")
                         .HasColumnType("bit");
 
+                    b.Property<string>("BankPassBook")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Block")
                         .HasColumnType("nvarchar(max)");
 
@@ -234,11 +226,14 @@ namespace Backend.Migrations
                     b.Property<string>("BoardName12")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CasteOrIncomeCertificate")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CertificateUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("ClassStartDate")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("ClassStartDate")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Community")
                         .HasColumnType("nvarchar(max)");
@@ -246,7 +241,13 @@ namespace Backend.Migrations
                     b.Property<string>("District")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DomicileCertificate")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("FatherName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FeeReceiptOfCurrentYear")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HouseNumber")
@@ -255,10 +256,16 @@ namespace Backend.Migrations
                     b.Property<string>("InstituteCode")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("InstituteIdCard")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("InstituteName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDisabled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRejected")
                         .HasColumnType("bit");
 
                     b.Property<string>("MartialStatus")
@@ -291,6 +298,9 @@ namespace Backend.Migrations
                     b.Property<decimal>("PercentageDisability")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("Photo")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Pincode")
                         .HasColumnType("int");
 
@@ -308,6 +318,9 @@ namespace Backend.Migrations
 
                     b.Property<int>("PreviousPassingYear")
                         .HasColumnType("int");
+
+                    b.Property<string>("PreviousYearMarksheet")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RollNo10")
                         .HasColumnType("nvarchar(max)");
@@ -334,6 +347,12 @@ namespace Backend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UniversityBoardName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("_10thMarkSheet")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("_12thMarkSheet")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ApplicationId");
@@ -383,8 +402,8 @@ namespace Backend.Migrations
                     b.Property<string>("BankName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("DateOfBirth")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("District")
                         .HasColumnType("nvarchar(max)");
@@ -427,41 +446,6 @@ namespace Backend.Migrations
                     b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("Backend.Models.StudentDocument", b =>
-                {
-                    b.Property<int>("DocId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("ApplicationId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("DocName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DocUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ScholarshipApplicationApplicationId")
-                        .HasColumnType("int");
-
-                    b.HasKey("DocId");
-
-                    b.HasIndex("ScholarshipApplicationApplicationId");
-
-                    b.ToTable("StudentDocuments");
-                });
-
-            modelBuilder.Entity("Backend.Models.InstituteDocument", b =>
-                {
-                    b.HasOne("Backend.Models.Institute", "Institute")
-                        .WithMany("InstituteDocument")
-                        .HasForeignKey("InstituteId");
-
-                    b.Navigation("Institute");
-                });
-
             modelBuilder.Entity("Backend.Models.ScholarshipApplication", b =>
                 {
                     b.HasOne("Backend.Models.ScholarshipScheme", "ScholarshipScheme")
@@ -492,25 +476,9 @@ namespace Backend.Migrations
                     b.Navigation("Institute");
                 });
 
-            modelBuilder.Entity("Backend.Models.StudentDocument", b =>
-                {
-                    b.HasOne("Backend.Models.ScholarshipApplication", "ScholarshipApplication")
-                        .WithMany("StudentDocument")
-                        .HasForeignKey("ScholarshipApplicationApplicationId");
-
-                    b.Navigation("ScholarshipApplication");
-                });
-
             modelBuilder.Entity("Backend.Models.Institute", b =>
                 {
-                    b.Navigation("InstituteDocument");
-
                     b.Navigation("Student");
-                });
-
-            modelBuilder.Entity("Backend.Models.ScholarshipApplication", b =>
-                {
-                    b.Navigation("StudentDocument");
                 });
 
             modelBuilder.Entity("Backend.Models.ScholarshipScheme", b =>

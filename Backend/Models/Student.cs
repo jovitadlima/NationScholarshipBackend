@@ -12,7 +12,7 @@ namespace Backend.Models
         [Key]
         public int StudentId { get; set; }
         public string StudentName { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        public string DateOfBirth { get; set; }
         public string Gender { get; set; }
         public string Email { get; set; }
         public string InstituteCode { get; set; }

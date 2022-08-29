@@ -18,8 +18,6 @@ namespace Backend.Models
         public DbSet<Ministry> Ministries { get; set; }
         public DbSet<NodalOfficer> NodalOfficers { get; set; }
         public DbSet<ScholarshipScheme> ScholarshipSchemes { get; set; }
-        public DbSet<InstituteDocument> InstituteDocuments { get; set; }
-        public DbSet<StudentDocument> StudentDocuments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
