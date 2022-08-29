@@ -37,7 +37,7 @@ namespace Backend.Controllers
             {
                 if (instituteRegisterDto.Password != instituteRegisterDto.Password2)
                 {
-                    return BadRequest("Password doest match with confirm password");
+                    return BadRequest(new { Message = "Password doest match with confirm password" });
                 }
 
                 CreatePasswordHash(instituteRegisterDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
@@ -73,11 +73,11 @@ namespace Backend.Controllers
                 var result = _context.SaveChanges() > 0;
                 if (result)
                 {
-                    return Ok(institute);
+                    return Ok(new {Result = result});
                 }
                 else
                 {
-                    return BadRequest("Failed to create Institute");
+                    return BadRequest(new {Message = "Registration Failed" });
                 }
             }
             catch (Exception ex)
@@ -97,12 +97,12 @@ namespace Backend.Controllers
 
                 if (instituteUser == null)
                 {
-                    return NotFound("User not found");
+                    return NotFound(new { Message = "User not found" });
                 }
 
                 if (!VerifyPasswordHash(studentLoginDto.Password, instituteUser.PasswordHash, instituteUser.PasswordSalt))
                 {
-                    return BadRequest("Wrong password.");
+                    return BadRequest(new { Message = "Wrong password." });
                 }
 
                 string token = GenerateToken(instituteUser);
@@ -148,7 +148,7 @@ namespace Backend.Controllers
                     .Where(x => x.InstituteCode == GetInstituteCode())
                     .FirstOrDefault();
 
-                if (institute == null) return NotFound();
+                if (institute == null) return NotFound(new { Message = "Intitute does not exist" });
 
                 return Ok(institute);
             }
@@ -169,7 +169,7 @@ namespace Backend.Controllers
                     .Where(x => x.InstituteCode == GetInstituteCode())
                     .ToList();
 
-                if (!students.Any()) return NotFound("No Students");
+                if (!students.Any()) return NotFound(new { Message = "No Students" });
 
                 return Ok(students);
             }
@@ -208,7 +208,7 @@ namespace Backend.Controllers
                     .Where(app => app.InstituteCode == GetInstituteCode() && !app.ApprovedByInstitute)
                     .ToList();
 
-                if (!applications.Any()) return NotFound("No Applications");
+                if (!applications.Any()) return NotFound(new { Message = "No Applications found" });
 
                 return Ok(applications);
             }
