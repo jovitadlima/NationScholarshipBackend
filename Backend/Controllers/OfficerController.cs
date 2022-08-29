@@ -58,7 +58,7 @@ namespace Backend.Controllers
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Email, officer.OfficerEmail),
+                new Claim(ClaimTypes.Name, officer.OfficerEmail),
                 new Claim(ClaimTypes.Role, "Officer")
             };
 
@@ -77,7 +77,7 @@ namespace Backend.Controllers
             return jwt;
         }
 
-        [HttpGet("GetPendingInstitutes")]
+        [HttpGet("PendingInstitutes")]
         [Authorize(Roles = "Officer")]
         public IActionResult GetInstitutes()
         {
@@ -97,17 +97,17 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpGet("GetPendingInstitutes/{id}")]
+        [HttpGet("PendingInstitutes/{id}")]
         [Authorize(Roles = "Officer")]
-        public IActionResult GetInstitutes(int id)
+        public IActionResult GetInstitute(int id)
         {
             try
             {
-                var institute = _context.Institutes.Find(id);
+                var pendingInstitute = _context.Institutes.Find(id);
 
-                if (institute == null) return NotFound();
+                if (pendingInstitute == null) return NotFound("Institute not found");
 
-                return Ok(institute);
+                return Ok(pendingInstitute);
             }
             catch (Exception ex)
             {
@@ -115,17 +115,19 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpGet("GetPendingApplications")]
+        [HttpGet("PendingApplications")]
         [Authorize(Roles = "Officer")]
         public IActionResult GetApplications()
         {
             try
             {
-                var application = _context.ScholarshipApplications
+                var pendingApplications = _context.ScholarshipApplications
                     .Where(x => !x.ApprovedByOfficer)
                     .ToList();
 
-                return Ok(application);
+                if (!pendingApplications.Any()) return BadRequest("Application not found");
+
+                return Ok(pendingApplications);
             }
             catch (Exception ex)
             {
@@ -133,9 +135,9 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpGet("GetPendingApplications/{id}")]
+        [HttpGet("PendingApplications/{id}")]
         [Authorize(Roles = "Officer")]
-        public IActionResult GetApplications(int id)
+        public IActionResult GetApplication(int id)
         {
             try
             {
@@ -160,6 +162,8 @@ namespace Backend.Controllers
 
                 if (institute == null) return NotFound();
 
+                if (institute.ApprovedByOfficer) return BadRequest("Already approved by officer");
+
                 institute.ApprovedByOfficer = true;
 
                 var result = _context.SaveChanges() > 0;
@@ -182,6 +186,10 @@ namespace Backend.Controllers
 
                 if (application == null) return NotFound();
 
+                if (!application.ApprovedByInstitute) return BadRequest("Institute needs to approve before officer");
+
+                if (application.ApprovedByOfficer) return BadRequest("Already approved by officer");
+
                 application.ApprovedByOfficer = true;
 
                 var result = _context.SaveChanges() > 0;
@@ -192,6 +200,11 @@ namespace Backend.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        private string GetOfficerEmail()
+        {
+            return User?.Identity?.Name;
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

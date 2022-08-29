@@ -58,7 +58,7 @@ namespace Backend.Controllers
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Email, ministry.MinistryEmail),
+                new Claim(ClaimTypes.Name, ministry.MinistryEmail),
                 new Claim(ClaimTypes.Role, "Ministry")
             };
 
@@ -77,7 +77,7 @@ namespace Backend.Controllers
             return jwt;
         }
 
-        [HttpGet("GetPendingInstitutes")]
+        [HttpGet("PendingInstitutes")]
         [Authorize(Roles = "Ministry")]
         public IActionResult GetInstitutes()
         {
@@ -97,17 +97,17 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpGet("GetPendingInstitutes/{id}")]
+        [HttpGet("PendingInstitutes/{id}")]
         [Authorize(Roles = "Ministry")]
         public IActionResult GetInstitutes(int id)
         {
             try
             {
-                var institute = _context.Institutes.Find(id);
+                var pendingInstitute = _context.Institutes.Find(id);
 
-                if (institute == null) return NotFound();
+                if (pendingInstitute == null) return NotFound();
 
-                return Ok(institute);
+                return Ok(pendingInstitute);
             }
             catch (Exception ex)
             {
@@ -115,7 +115,7 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpGet("GetPendingApplications")]
+        [HttpGet("PendingApplications")]
         [Authorize(Roles = "Ministry")]
         public IActionResult GetApplications()
         {
@@ -135,17 +135,17 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpGet("GetPendingApplications/{id}")]
+        [HttpGet("PendingApplications/{id}")]
         [Authorize(Roles = "Ministry")]
         public IActionResult GetApplications(int id)
         {
             try
             {
-                var application = _context.ScholarshipApplications.Find(id);
+                var pendingApplication = _context.ScholarshipApplications.Find(id);
 
-                if (application == null) return NotFound();
+                if (pendingApplication == null) return NotFound();
 
-                return Ok(application);
+                return Ok(pendingApplication);
             }
             catch (Exception ex)
             {
@@ -159,9 +159,15 @@ namespace Backend.Controllers
         {
             try
             {
-                var pendingInstitute = _context.Institutes.Find(id);
+                var institute = _context.Institutes.Find(id);
 
-                pendingInstitute.ApprovedByMinistry = true;
+                if (institute == null) return NotFound("Institute not found");
+
+                if (!institute.ApprovedByOfficer) return BadRequest("Officer needs to approve before ministry");
+
+                if (institute.ApprovedByMinistry) return BadRequest("Already approved by ministry");
+
+                institute.ApprovedByMinistry = true;
 
                 var result = _context.SaveChanges() > 0;
 
@@ -181,6 +187,14 @@ namespace Backend.Controllers
             {
                 var application = _context.ScholarshipApplications.Find(id);
 
+                if (application == null) return NotFound("Application not found");
+
+                if (!application.ApprovedByInstitute) return BadRequest("Institute needs to approve before officer and ministry");
+
+                if (!application.ApprovedByOfficer) return BadRequest("Officer needs to approve before ministry");
+
+                if (application.ApprovedByMinistry) return BadRequest("Already approved by ministry");
+
                 application.ApprovedByMinistry = true;
 
                 var result = _context.SaveChanges() > 0;
@@ -192,6 +206,11 @@ namespace Backend.Controllers
             {
                 return BadRequest(ex.InnerException.Message);
             }
+        }
+
+        private string GetMinistryEmail()
+        {
+            return User?.Identity?.Name;
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

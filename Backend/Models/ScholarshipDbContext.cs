@@ -23,6 +23,8 @@ namespace Backend.Models
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            builder.Seed();
+
             builder.Entity<Institute>().HasIndex(p => new { p.DiseCode, p.InstituteCode }).IsUnique();
 
             builder.Entity<Student>().HasIndex(p => new { p.AadharNumber, p.PhoneNo, p.BankAccountNumber }).IsUnique();
