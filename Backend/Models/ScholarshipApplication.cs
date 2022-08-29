@@ -53,6 +53,18 @@ namespace Backend.Models
         public string CertificateUrl { get; set; }
         public string InstituteCode { get; set; }
 
+        public bool IsRejected { get; set; } = false;
+
+        public string DomicileCertificate { get; set; }
+        public string Photo { get; set; }
+        public string InstituteIdCard { get; set; }
+        public string CasteOrIncomeCertificate { get; set; }
+        public string PreviousYearMarksheet { get; set; }
+        public string FeeReceiptOfCurrentYear { get; set; }
+        public string BankPassBook { get; set; }
+        public string AadharCard { get; set; }
+        public string _10thMarkSheet { get; set; }
+        public string _12thMarkSheet { get; set; }
 
         // navigation property
         public int StudentId { get; set; }
@@ -62,6 +74,5 @@ namespace Backend.Models
         public int SchemeId { get; set; }
         public ScholarshipScheme ScholarshipScheme { get; set; }
 
-        public ICollection<StudentDocument> StudentDocument { get; set; }
     }
 }

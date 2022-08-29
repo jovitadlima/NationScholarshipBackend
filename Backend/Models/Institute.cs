@@ -32,12 +32,14 @@ namespace Backend.Models
         public string Telephone { get; set; }
         public bool ApprovedByOfficer { get; set; } = false;
         public bool ApprovedByMinistry { get; set; } = false;
+        public bool IsRejected { get; set; } = false;
+        public string RegistrationCertificate { get; set; }
+        public string UniversityAffliationCertificate { get; set; }
 
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
 
         // navigation property
         public ICollection<Student> Student { get; set; }
-        public ICollection<InstituteDocument> InstituteDocument { get; set; }
     }
 }

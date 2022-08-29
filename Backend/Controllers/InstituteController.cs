@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
@@ -30,7 +31,8 @@ namespace Backend.Controllers
 
         [HttpPost]
         [Route("Register")]
-        public IActionResult Register([FromBody] InstituteRegisterDto instituteRegisterDto)
+        public IActionResult Register([FromForm] IFormFile file1, [FromForm] IFormFile file2,
+            [FromForm] InstituteRegisterDto instituteRegisterDto)
         {
             try
             {
@@ -66,6 +68,24 @@ namespace Backend.Controllers
                     PasswordHash = passwordHash,
                     PasswordSalt = passwordSalt
                 };
+
+                string directoryPath = @"D:\Document_Project\InstituteDocument\" + institute.InstituteCode;
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+                string filepath1 = Path.Combine(directoryPath, file1.FileName);
+                string filepath2 = Path.Combine(directoryPath, file2.FileName);
+                using (var stream = new FileStream(filepath1, FileMode.Create))
+                {
+                    file1.CopyTo(stream);
+                }
+                using (var stream = new FileStream(filepath2, FileMode.Create))
+                {
+                    file2.CopyTo(stream);
+                }
+                institute.RegistrationCertificate = filepath1;
+                institute.UniversityAffliationCertificate = filepath2;
 
                 _context.Institutes.Add(institute);
 
@@ -259,7 +279,7 @@ namespace Backend.Controllers
 
         [HttpPost("VerifyPendingApplication/{id}")]
         [Authorize(Roles = "Institute")]
-        public IActionResult PostVerifyApplication(int id, [FromBody] InstituteApprovalDto instituteApprovalDto)
+        public IActionResult PostVerifyApplication(int id, IFormFile file)
         {
             try
             {
@@ -274,11 +294,23 @@ namespace Backend.Controllers
                     return BadRequest("You cannot approve applications of student from different institute");
                 }
 
-                application.ApprovedByInstitute = instituteApprovalDto.Approval;
+                application.ApprovedByInstitute = true;
 
                 if (application.ApprovedByInstitute)
                 {
-                    application.CertificateUrl = instituteApprovalDto.Url;
+                    string directorypath = @"D:/Certificates-Bonafide/" + application.StudentId;
+                    if (!Directory.Exists(directorypath))
+                    {
+                        Directory.CreateDirectory(directorypath);
+                    }
+                    string filepath = Path.Combine(directorypath, file.FileName);
+                    using (var stream = new FileStream(filepath, FileMode.Create))
+                    {
+                        file.CopyTo(stream);
+                    }
+
+                    application.CertificateUrl = filepath;
+
                     _context.SaveChanges();
                     return Ok("Approved");
                 }

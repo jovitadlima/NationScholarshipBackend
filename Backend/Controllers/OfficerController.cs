@@ -202,6 +202,54 @@ namespace Backend.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("RejectApplication/{id}")]
+        [Authorize(Roles = "Officer")]
+        //reject the scholarship application
+        public IActionResult RejectApplication(int id)
+        {
+            try
+            {
+                var application = _context.ScholarshipApplications
+                    .Where(application => application.ApplicationId == id)
+                    .FirstOrDefault();
+
+                application.IsRejected = true;
+
+                var result = _context.SaveChanges() > 0;
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("RejectInstitute/{id}")]
+        [Authorize(Roles = "Officer")]
+        //reject the scholarship application
+        public IActionResult RejectInstitute(int id)
+        {
+            try
+            {
+                var institute = _context.Institutes
+                    .Where(institute => institute.InstituteId == id)
+                    .FirstOrDefault();
+
+                institute.IsRejected = true;
+
+                var result = _context.SaveChanges() > 0;
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         private string GetOfficerEmail()
         {
             return User?.Identity?.Name;

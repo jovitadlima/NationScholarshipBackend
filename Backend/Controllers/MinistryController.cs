@@ -208,6 +208,52 @@ namespace Backend.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("RejectApplication/{id}")]
+        //reject the scholarship application
+        public IActionResult RejectApplication(int id)
+        {
+            try
+            {
+                var application = _context.ScholarshipApplications
+                    .Where(application => application.ApplicationId == id)
+                    .FirstOrDefault();
+
+                application.IsRejected = true;
+
+                var result = _context.SaveChanges() > 0;
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.InnerException.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("RejectInstitute/{id}")]
+        //reject the scholarship application
+        public IActionResult RejectInstitute(int id)
+        {
+            try
+            {
+                var institute = _context.Institutes
+                    .Where(institute => institute.InstituteId == id)
+                    .FirstOrDefault();
+
+                institute.IsRejected = true;
+
+                var result = _context.SaveChanges() > 0;
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.InnerException.Message);
+            }
+        }
+
         private string GetMinistryEmail()
         {
             return User?.Identity?.Name;

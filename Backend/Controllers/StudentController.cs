@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
+using System.IO;
 
 namespace Backend.Controllers
 {
@@ -218,7 +219,8 @@ namespace Backend.Controllers
         // needs to be modified, student id should be taken from jwt token not passed by json request
         [HttpPost("CreateApplication")]
         [Authorize(Roles = "Student")]
-        public IActionResult CreateApplication([FromBody] StudentApplicationDto studentApplicationDto)
+        public IActionResult CreateApplication([FromForm] IFormFile file1, [FromForm] IFormFile file2, [FromForm] IFormFile file3, [FromForm] IFormFile file4, [FromForm] IFormFile file5, [FromForm] IFormFile file6, [FromForm] IFormFile file7, [FromForm] IFormFile file8, [FromForm] IFormFile file9, [FromForm] IFormFile file10,
+            [FromForm] StudentApplicationDto studentApplicationDto)
         {
             try
             {
@@ -278,6 +280,74 @@ namespace Backend.Controllers
                     SchemeId = studentApplicationDto.SchemeId,
                     InstituteCode = studentApplicationDto.InstituteCode
                 };
+
+                string directoryPath = @"D:\Document_Project\ScholarshipApplicationDocuments\" + GetStudentAadharNumber();
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+                string filepath1 = Path.Combine(directoryPath, file1.FileName);
+                string filepath2 = Path.Combine(directoryPath, file2.FileName);
+                string filepath3 = Path.Combine(directoryPath, file3.FileName);
+                string filepath4 = Path.Combine(directoryPath, file4.FileName);
+                string filepath5 = Path.Combine(directoryPath, file5.FileName);
+                string filepath6 = Path.Combine(directoryPath, file6.FileName);
+                string filepath7 = Path.Combine(directoryPath, file7.FileName);
+                string filepath8 = Path.Combine(directoryPath, file8.FileName);
+                string filepath9 = Path.Combine(directoryPath, file9.FileName);
+                string filepath10 = Path.Combine(directoryPath, file10.FileName);
+                using (var stream = new FileStream(filepath1, FileMode.Create))
+                {
+                    file1.CopyTo(stream);
+                }
+                using (var stream = new FileStream(filepath2, FileMode.Create))
+                {
+                    file2.CopyTo(stream);
+                }
+                using (var stream = new FileStream(filepath3, FileMode.Create))
+                {
+                    file3.CopyTo(stream);
+                }
+                using (var stream = new FileStream(filepath4, FileMode.Create))
+                {
+                    file4.CopyTo(stream);
+                }
+                using (var stream = new FileStream(filepath5, FileMode.Create))
+                {
+                    file5.CopyTo(stream);
+                }
+                using (var stream = new FileStream(filepath6, FileMode.Create))
+                {
+                    file6.CopyTo(stream);
+                }
+                using (var stream = new FileStream(filepath7, FileMode.Create))
+                {
+                    file7.CopyTo(stream);
+                }
+                using (var stream = new FileStream(filepath8, FileMode.Create))
+                {
+                    file8.CopyTo(stream);
+                }
+                using (var stream = new FileStream(filepath9, FileMode.Create))
+                {
+                    file9.CopyTo(stream);
+                }
+                using (var stream = new FileStream(filepath10, FileMode.Create))
+                {
+                    file10.CopyTo(stream);
+                }
+
+                studentApplication.DomicileCertificate = filepath1;
+                studentApplication.Photo = filepath2;
+                studentApplication.InstituteIdCard = filepath3;
+                studentApplication.CasteOrIncomeCertificate = filepath4;
+                studentApplication.PreviousYearMarksheet = filepath5;
+                studentApplication.FeeReceiptOfCurrentYear = filepath6;
+                studentApplication.BankPassBook = filepath7;
+                studentApplication.AadharCard = filepath8;
+                studentApplication._10thMarkSheet = filepath9;
+                studentApplication._12thMarkSheet = filepath10;
+
 
                 _context.ScholarshipApplications.Add(studentApplication);
 
