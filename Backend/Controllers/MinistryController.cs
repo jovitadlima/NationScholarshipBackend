@@ -84,7 +84,7 @@ namespace Backend.Controllers
             try
             {
                 var pendingInstitutes = _context.Institutes
-                    .Where(x => x.ApprovedByOfficer && !x.ApprovedByMinistry)
+                    .Where(x => x.ApprovedByOfficer && !x.ApprovedByMinistry && !x.IsRejected)
                     .ToList();
 
                 if (!pendingInstitutes.Any()) return NotFound("No application pending");
@@ -122,7 +122,7 @@ namespace Backend.Controllers
             try
             {
                 var pendingApplications = _context.ScholarshipApplications
-                    .Where(app => app.ApprovedByInstitute && app.ApprovedByOfficer && !app.ApprovedByMinistry)
+                    .Where(app => app.ApprovedByInstitute && app.ApprovedByOfficer && !app.ApprovedByMinistry && !app.IsRejected)
                     .ToList();
 
                 if (!pendingApplications.Any()) return BadRequest("No application present");

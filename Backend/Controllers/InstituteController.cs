@@ -102,7 +102,7 @@ namespace Backend.Controllers
 
                 if (!VerifyPasswordHash(studentLoginDto.Password, instituteUser.PasswordHash, instituteUser.PasswordSalt))
                 {
-                    return BadRequest(new { Message = "Wrong password." });
+                    return NotFound(new { Message = "Wrong password." });
                 }
 
                 string token = GenerateToken(instituteUser);
@@ -169,7 +169,7 @@ namespace Backend.Controllers
                     .Where(x => x.InstituteCode == GetInstituteCode())
                     .ToList();
 
-                if (!students.Any()) return NotFound(new { Message = "No Students" });
+                if (!students.Any()) return NotFound(new { Message = "No Students present" });
 
                 return Ok(students);
             }
@@ -228,10 +228,10 @@ namespace Backend.Controllers
 
                 if (application.InstituteCode != GetInstituteCode())
                 {
-                    return BadRequest("You cannot view application of students from different institute");
+                    return BadRequest(new { Message = "You cannot view application of students from different institute" });
                 }
 
-                if (application == null) return NotFound("Application not found");
+                if (application == null) return NotFound(new { Message = "Application not found" });
 
                 return Ok(application);
             }
@@ -270,9 +270,30 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpPost("VerifyPendingApplication/{id}")]
+        [HttpGet("ApprovedApplications")]
         [Authorize(Roles = "Institute")]
-        public IActionResult PostVerifyApplication(int id, InstituteApprovalDto instituteApprovalDto)
+        public IActionResult GetApprovedApplications()
+        {
+            try
+            {
+                var applications = _context.ScholarshipApplications
+                    .Where(app => app.InstituteCode == GetInstituteCode() && app.ApprovedByInstitute)
+                    .ToList();
+
+                if (!applications.Any()) return NotFound(new { Message = "No Applications found" });
+
+                return Ok(applications);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.InnerException.Message);
+            }
+        }
+
+        // need to modify for file upload
+        [HttpGet("VerifyPendingApplication/{id}")]
+        [Authorize(Roles = "Institute")]
+        public IActionResult VerifyApplication(int id)
         {
             try
             {
@@ -280,11 +301,11 @@ namespace Backend.Controllers
                     .Where(app => app.ApplicationId == id)
                     .FirstOrDefault();
 
-                if (application == null) return NotFound("No such application");
+                if (application == null) return NotFound(new { Message = "No such application"});
 
                 if (application.InstituteCode != GetInstituteCode())
                 {
-                    return BadRequest("You cannot approve applications of student from different institute");
+                    return BadRequest(new { Message = "You cannot approve applications of student from different institute"});
                 }
 
                 application.ApprovedByInstitute = true;
@@ -292,14 +313,51 @@ namespace Backend.Controllers
                 if (application.ApprovedByInstitute)
                 {
 
-                    application.CertificateUrl = instituteApprovalDto.Url;
+                    application.CertificateUrl = "";
 
                     _context.SaveChanges();
-                    return Ok("Approved");
+                    return Ok(new { Message = "Approved" });
                 }
                 else
                 {
-                    return BadRequest("Application Rejected");
+                    return BadRequest(new { Message = "Application Rejected" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.InnerException.Message);
+            }
+        }
+
+        // need to modify for file upload
+        [HttpGet("RejectPendingApplication/{id}")]
+        [Authorize(Roles = "Institute")]
+        public IActionResult RejectApplication(int id)
+        {
+            try
+            {
+                var application = _context.ScholarshipApplications
+                    .Where(app => app.ApplicationId == id)
+                    .FirstOrDefault();
+
+                if (application == null) return NotFound(new { Message = "No such application" });
+
+                if (application.InstituteCode != GetInstituteCode())
+                {
+                    return BadRequest(new { Message = "You cannot approve applications of student from different institute" });
+                }
+
+                application.IsRejected = true;
+
+                var result = _context.SaveChanges() > 0;
+
+                if (result)
+                {
+                    return Ok(new { Message = "Application Rejected" });
+                }
+                else
+                {
+                    return BadRequest(new { Message = "Application Rejected" });
                 }
             }
             catch (Exception ex)
