@@ -153,7 +153,7 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpPost("VerifyInstitute/{id}")]
+        [HttpGet("VerifyInstitute/{id}")]
         [Authorize(Roles = "Ministry")]
         public IActionResult VerifyInstitute(int id)
         {
@@ -179,7 +179,7 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpPost("VerifyApplication/{id}")]
+        [HttpGet("VerifyApplication/{id}")]
         [Authorize(Roles = "Ministry")]
         public IActionResult VerifyApplication(int id)
         {
@@ -208,8 +208,8 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("RejectApplication/{id}")]
+        [HttpGet("RejectApplication/{id}")]
+        [Authorize(Roles = "Ministry")]
         //reject the scholarship application
         public IActionResult RejectApplication(int id)
         {
@@ -231,8 +231,8 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("RejectInstitute/{id}")]
+        [HttpGet("RejectInstitute/{id}")]
+        [Authorize(Roles = "Ministry")]
         //reject the scholarship application
         public IActionResult RejectInstitute(int id)
         {

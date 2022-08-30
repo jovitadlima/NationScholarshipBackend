@@ -73,6 +73,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Ministry")]
         public IActionResult CreateScheme([FromBody] ScholarshipSchemeDto scholarshipSchemeDto)
         {
             try
@@ -88,19 +89,20 @@ namespace Backend.Controllers
                 if (result)
                 {
                     return Ok(result);
-                } else
+                }
+                else
                 {
                     return BadRequest("Faced some problem....");
                 }
-            } 
-            catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.InnerException.Message);
             }
         }
 
-        [HttpPut]
-        [Route("edit/{id}")]
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Ministry")]
         public IActionResult EditScheme(int id, [FromBody] ScholarshipSchemeDto scholarshipSchemeDto)
         {
             try
@@ -126,6 +128,7 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Ministry")]
         public IActionResult DeleteScheme(int id)
         {
             try
@@ -136,7 +139,9 @@ namespace Backend.Controllers
                 var result = _context.SaveChanges() > 0;
                 if (result)
                 {
-                    return Ok(result);
+                    var schemes = _context.ScholarshipSchemes.ToList();
+
+                    return Ok(schemes);
                 }
                 else
                 {

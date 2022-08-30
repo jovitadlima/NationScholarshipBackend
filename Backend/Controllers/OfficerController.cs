@@ -87,7 +87,7 @@ namespace Backend.Controllers
                     .Where(x => !x.ApprovedByOfficer)
                     .ToList();
 
-                if (!pendingInstitutes.Any()) return NotFound( new { Message = "No application pending" });
+                if (!pendingInstitutes.Any()) return NotFound(new { Message = "No application pending" });
 
                 return Ok(pendingInstitutes);
             }
@@ -147,12 +147,13 @@ namespace Backend.Controllers
 
                 return Ok(application);
             }
-            catch(Exception ex) { 
+            catch (Exception ex)
+            {
                 return BadRequest(ex.InnerException.Message);
-            } 
+            }
         }
 
-        [HttpPost("VerifyInstitute/{id}")]
+        [HttpGet("VerifyInstitute/{id}")]
         [Authorize(Roles = "Officer")]
         public IActionResult VerifyInstitute(int id)
         {
@@ -176,7 +177,7 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpPost("VerifyApplication/{id}")]
+        [HttpGet("VerifyApplication/{id}")]
         [Authorize(Roles = "Officer")]
         public IActionResult VerifyApplication(int id)
         {
@@ -202,8 +203,7 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("RejectApplication/{id}")]
+        [HttpGet("RejectApplication/{id}")]
         [Authorize(Roles = "Officer")]
         //reject the scholarship application
         public IActionResult RejectApplication(int id)
@@ -226,8 +226,7 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("RejectInstitute/{id}")]
+        [HttpGet("RejectInstitute/{id}")]
         [Authorize(Roles = "Officer")]
         //reject the scholarship application
         public IActionResult RejectInstitute(int id)
