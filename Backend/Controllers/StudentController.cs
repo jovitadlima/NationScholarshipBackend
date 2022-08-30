@@ -237,6 +237,10 @@ namespace Backend.Controllers
                     return BadRequest("Institute Code is not equal");
                 }
 
+                var check = _context.ScholarshipApplications.Any(app => app.StudentId == student.StudentId);
+
+                if (check) return BadRequest(new { Message = "You have already applied for this scheme" });
+
                 var studentApplication = new ScholarshipApplication()
                 {
                     AadharNumber = studentApplicationDto.AadharNumber,

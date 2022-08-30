@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 
 namespace Backend.Models
@@ -7,46 +8,41 @@ namespace Backend.Models
     {
         public static void Seed(this ModelBuilder modelBuilder)
         {
+            List<byte[]> ministryPassword = CreatePasswordHash("mpassword");
             modelBuilder.Entity<Ministry>().HasData(
                 new Ministry
                 {
                     MinistryId = 1,
                     Name = "Ministry",
                     MinistryEmail = "ministry@nsp.com",
-                    PasswordHash = CreatePasswordHash("mpassword"),
-                    PasswordSalt = CreatePasswordSalt("mpassword")
+                    PasswordHash = ministryPassword[1],
+                    PasswordSalt = ministryPassword[0]
                 }
             );
 
+            List<byte[]> officerPassword = CreatePasswordHash("opassword");
             modelBuilder.Entity<NodalOfficer>().HasData(
                 new NodalOfficer
                 {
                     OfficerId = 1,
                     OfficerName = "Officer",
                     OfficerEmail = "officer@nsp.com",
-                    PasswordHash = CreatePasswordHash("opassword"),
-                    PasswordSalt = CreatePasswordSalt("opassword")
+                    PasswordHash = officerPassword[1],
+                    PasswordSalt = officerPassword[0]
                 }
             );
         }
 
-        private static byte[] CreatePasswordHash(string password)
+        private static List<byte[]> CreatePasswordHash(string password)
         {
-            byte[] passwordHash;
             using (var hmac = new HMACSHA512())
             {
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                return passwordHash;
-            }
-        }
-
-        private static byte[] CreatePasswordSalt(string password)
-        {
-            byte[] passwordSalt;
-            using (var hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                return passwordSalt;
+                List<byte[]> list = new List<byte[]>();
+                byte[] passwordSalt = hmac.Key;
+                list.Add(passwordSalt);
+                byte[] passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                list.Add(passwordHash);
+                return list;
             }
         }
     }

@@ -99,6 +99,32 @@ namespace Backend.Controllers
             }
         }
 
+        [HttpPut]
+        [Route("edit/{id}")]
+        public IActionResult EditScheme(int id, [FromBody] ScholarshipSchemeDto scholarshipSchemeDto)
+        {
+            try
+            {
+                var scheme = _context.ScholarshipSchemes.Find(id);
+                scheme.Name = scholarshipSchemeDto.Name;
+                scheme.Description = scholarshipSchemeDto.Description;
+
+                var result = _context.SaveChanges() > 0;
+                if (result)
+                {
+                    return Ok(new { Result = result });
+                }
+                else
+                {
+                    return BadRequest("Faced some problem....");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.InnerException.Message);
+            }
+        }
+
         [HttpDelete("{id}")]
         public IActionResult DeleteScheme(int id)
         {
