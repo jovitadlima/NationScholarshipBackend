@@ -113,7 +113,7 @@ namespace Backend.Controllers
                     .FirstOrDefault();
 
                 if (instituteUser == null) return NotFound("User not found");
-                
+
 
                 if (!GetRegistrationStatus(instituteUser))
                 {
@@ -215,7 +215,6 @@ namespace Backend.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("AllInstitutes")]
-        [Authorize(Roles = "Ministry")]
         public IActionResult GetAllInstitutes()
         {
             try
@@ -271,7 +270,6 @@ namespace Backend.Controllers
             {
                 var application = _context.ScholarshipApplications.Find(id);
 
-                if (application.ApprovedByInstitute) return BadRequest("Application is already approved");
 
                 if (application.InstituteCode != GetInstituteCode())
                 {
@@ -300,7 +298,7 @@ namespace Backend.Controllers
 
             bool status = officerApprovalStatus && ministryApprovalStatus;
             return status;
-            
+
         }
 
         /// <summary>
@@ -356,13 +354,13 @@ namespace Backend.Controllers
                 application.ApprovedByInstitute = true;
 
                 bool result = _context.SaveChanges() > 0;
-                if (result) 
-                { 
-                    return Ok("Approved");
+                if (result)
+                {
+                    return Ok(result);
                 }
                 else
                 {
-                    return BadRequest("Something went wrong..." );
+                    return BadRequest("Something went wrong...");
                 }
             }
             catch (Exception ex)
@@ -386,7 +384,7 @@ namespace Backend.Controllers
                     .Where(app => app.ApplicationId == id)
                     .FirstOrDefault();
 
-                if (application == null) return NotFound("No such application" );
+                if (application == null) return NotFound("No such application");
 
                 if (application.IsRejected) return BadRequest("Application already rejected");
 
@@ -394,7 +392,7 @@ namespace Backend.Controllers
 
                 if (application.InstituteCode != GetInstituteCode())
                 {
-                    return BadRequest("You cannot approve applications of student from different institute" );
+                    return BadRequest("You cannot approve applications of student from different institute");
                 }
 
                 application.IsRejected = true;
@@ -403,11 +401,11 @@ namespace Backend.Controllers
 
                 if (result)
                 {
-                    return Ok("Application Rejected" );
+                    return Ok("Application Rejected");
                 }
                 else
                 {
-                    return BadRequest("Something went wrong..." );
+                    return BadRequest("Something went wrong...");
                 }
             }
             catch (Exception ex)

@@ -41,9 +41,14 @@ namespace Backend.Controllers
         {
             try
             {
-                var check = _context.Students.Any(x => x.AadharNumber == studentRegisterDto.AadharNumber);
+                var checkStudent = _context.Students.Any(x => x.AadharNumber == studentRegisterDto.AadharNumber);
 
-                if (check) return BadRequest("Student already exists");
+                if (checkStudent) return BadRequest("Student already exists");
+
+                var checkInstitute = _context.Institutes.Any(x => x.InstituteCode == studentRegisterDto.InstituteCode);
+
+                if (!checkInstitute) return BadRequest($"Institute with code {studentRegisterDto.InstituteCode} does not exists");
+
 
                 if (studentRegisterDto.Password != studentRegisterDto.Password2)
                 {
