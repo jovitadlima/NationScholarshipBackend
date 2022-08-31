@@ -26,6 +26,12 @@ namespace Backend.Controllers
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// This method is used to sign in the ministry. The credentials are checked and if they match 
+        /// with database they are logged in.
+        /// </summary>
+        /// <param name="ministryLoginDto"></param>
+        /// <returns></returns>
         [HttpPost("Login")]
         public ActionResult<string> Login([FromBody] MinistryLoginDto ministryLoginDto)
         {
@@ -35,14 +41,11 @@ namespace Backend.Controllers
                     .Where(ministry => ministry.MinistryEmail == ministryLoginDto.Email)
                     .FirstOrDefault();
 
-                if (ministryUser == null)
-                {
-                    return NotFound("User not found");
-                }
+                if (ministryUser == null) return NotFound("User not found");
 
                 if (!VerifyPasswordHash(ministryLoginDto.Password, ministryUser.PasswordHash, ministryUser.PasswordSalt))
                 {
-                    return BadRequest("Wrong password.");
+                    return BadRequest("Wrong password");
                 }
 
                 string token = GenerateToken(ministryUser);
@@ -54,6 +57,11 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// This method is used to generate a jwt token.
+        /// </summary>
+        /// <param name="ministry"></param>
+        /// <returns></returns>
         private string GenerateToken(Ministry ministry)
         {
             List<Claim> claims = new List<Claim>
@@ -77,6 +85,10 @@ namespace Backend.Controllers
             return jwt;
         }
 
+        /// <summary>
+        /// To get a list of institutes pending verification by ministry
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("PendingInstitutes")]
         [Authorize(Roles = "Ministry")]
         public IActionResult GetInstitutes()
@@ -97,6 +109,11 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// To get details of pending institute by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("PendingInstitutes/{id}")]
         [Authorize(Roles = "Ministry")]
         public IActionResult GetInstitutes(int id)
@@ -105,7 +122,11 @@ namespace Backend.Controllers
             {
                 var pendingInstitute = _context.Institutes.Find(id);
 
-                if (pendingInstitute == null) return NotFound();
+                if (pendingInstitute == null) return NotFound("No institute found");
+
+                if (!pendingInstitute.ApprovedByOfficer) return BadRequest("Officer needs to verify institute before minstry");
+
+                if (pendingInstitute.ApprovedByMinistry) return BadRequest("Institute already verified by ministry");
 
                 return Ok(pendingInstitute);
             }
@@ -115,6 +136,10 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// To get all the applications which are not approved by ministry
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("PendingApplications")]
         [Authorize(Roles = "Ministry")]
         public IActionResult GetApplications()
@@ -135,6 +160,11 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// To get details of application by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("PendingApplications/{id}")]
         [Authorize(Roles = "Ministry")]
         public IActionResult GetApplications(int id)
@@ -145,6 +175,12 @@ namespace Backend.Controllers
 
                 if (pendingApplication == null) return NotFound();
 
+                if (!pendingApplication.ApprovedByInstitute) return BadRequest("Institute needs to approve application before officer");
+
+                if (!pendingApplication.ApprovedByOfficer) return BadRequest("Officer needs to approve application before minstry");
+
+                if (pendingApplication.ApprovedByMinistry) return BadRequest("Already approved by ministry");
+
                 return Ok(pendingApplication);
             }
             catch (Exception ex)
@@ -153,6 +189,11 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// To verify a institute
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("VerifyInstitute/{id}")]
         [Authorize(Roles = "Ministry")]
         public IActionResult VerifyInstitute(int id)
@@ -167,11 +208,20 @@ namespace Backend.Controllers
 
                 if (institute.ApprovedByMinistry) return BadRequest("Already approved by ministry");
 
+                if (institute.IsRejected) return BadRequest("You cannot verify a rejected institute");
+
                 institute.ApprovedByMinistry = true;
 
                 var result = _context.SaveChanges() > 0;
 
-                return Ok(result);
+                if (result)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest("Something went wrong....");
+                }
             }
             catch (Exception ex)
             {
@@ -179,6 +229,11 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// To verify a application
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("VerifyApplication/{id}")]
         [Authorize(Roles = "Ministry")]
         public IActionResult VerifyApplication(int id)
@@ -195,35 +250,62 @@ namespace Backend.Controllers
 
                 if (application.ApprovedByMinistry) return BadRequest("Already approved by ministry");
 
+                if (application.IsRejected) return BadRequest("You cannot approve a rejected application");
+
                 application.ApprovedByMinistry = true;
 
                 var result = _context.SaveChanges() > 0;
 
-                return Ok(result);
+                if (result)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest("Something went wrong....");
+                }
             }
-
             catch (Exception ex)
             {
                 return BadRequest(ex.InnerException.Message);
             }
         }
 
+        /// <summary>
+        /// To reject a application
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("RejectApplication/{id}")]
         [Authorize(Roles = "Ministry")]
-        //reject the scholarship application
         public IActionResult RejectApplication(int id)
         {
             try
             {
-                var application = _context.ScholarshipApplications
-                    .Where(application => application.ApplicationId == id)
-                    .FirstOrDefault();
+                var application = _context.ScholarshipApplications.Find(id);
+
+                if (application == null) return NotFound("No such application found");
+
+                if (application.IsRejected) return BadRequest("Application is already rejected");
+
+                if (!application.ApprovedByInstitute) return BadRequest("Institute needs to approve before officer and ministry");
+
+                if (!application.ApprovedByOfficer) return BadRequest("Officer needs to approve before ministry");
+
+                if (application.ApprovedByMinistry) return BadRequest("You cannot reject an approved application");
 
                 application.IsRejected = true;
 
                 var result = _context.SaveChanges() > 0;
 
-                return Ok(result);
+                if (result)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest("Something went wrong....");
+                }
             }
             catch (Exception ex)
             {
@@ -231,22 +313,39 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// To reject a institute
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("RejectInstitute/{id}")]
         [Authorize(Roles = "Ministry")]
-        //reject the scholarship application
         public IActionResult RejectInstitute(int id)
         {
             try
             {
-                var institute = _context.Institutes
-                    .Where(institute => institute.InstituteId == id)
-                    .FirstOrDefault();
+                var institute = _context.Institutes.Find(id);
+
+                if (institute == null) return NotFound("Institute not found");
+
+                if (institute.IsRejected) return BadRequest("Institute already rejected");
+
+                if (!institute.ApprovedByOfficer) return BadRequest("Officer needs to verify the institute before ministry");
+
+                if (institute.ApprovedByMinistry) return BadRequest("You cannot reject a verified institute");
 
                 institute.IsRejected = true;
 
                 var result = _context.SaveChanges() > 0;
 
-                return Ok(result);
+                if (result)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest("Something went wrong....");
+                }
             }
             catch (Exception ex)
             {
@@ -254,11 +353,21 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// To get the email of the logged in ministry
+        /// </summary>
+        /// <returns></returns>
         private string GetMinistryEmail()
         {
             return User?.Identity?.Name;
         }
 
+        /// <summary>
+        /// To generate a hash of the password to securely store the password in database
+        /// </summary>
+        /// <param name="password"></param>
+        /// <param name="passwordHash"></param>
+        /// <param name="passwordSalt"></param>
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using (var hmac = new HMACSHA512())
@@ -268,6 +377,14 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// To verify if the password provided by user matched with the hashed password
+        /// stored in the database
+        /// </summary>
+        /// <param name="password"></param>
+        /// <param name="passwordHash"></param>
+        /// <param name="passwordSalt"></param>
+        /// <returns></returns>
         private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
             using (var hmac = new HMACSHA512(passwordSalt))

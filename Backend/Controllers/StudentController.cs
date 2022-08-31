@@ -30,18 +30,27 @@ namespace Backend.Controllers
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// This method is used to register a student. It checks if the all the credentials match. Then it saves the 
+        /// student data in the database.
+        /// </summary>
+        /// <param name="studentRegisterDto"></param>
+        /// <returns></returns>
         [HttpPost("Register")]
         public IActionResult Register([FromBody] StudentRegisterDto studentRegisterDto)
         {
             try
             {
+                var check = _context.Students.Any(x => x.AadharNumber == studentRegisterDto.AadharNumber);
+
+                if (check) return BadRequest("Student already exists");
+
                 if (studentRegisterDto.Password != studentRegisterDto.Password2)
                 {
                     return BadRequest("Password doest match with confirm password");
                 }
 
                 CreatePasswordHash(studentRegisterDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
-
 
                 var student = new Student()
                 {
@@ -61,7 +70,6 @@ namespace Backend.Controllers
                     PasswordSalt = passwordSalt
                 };
 
-                // create institute first
                 var institute = _context.Institutes
                     .Where(x => x.InstituteCode == student.InstituteCode)
                     .FirstOrDefault();
@@ -77,7 +85,7 @@ namespace Backend.Controllers
                 }
                 else
                 {
-                    return BadRequest("Failed to create student");
+                    return BadRequest("Registration failed");
                 }
             }
             catch (Exception ex)
@@ -86,6 +94,12 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// This method is used to sign in a student. The credentials are checked and if they match 
+        /// with database they are logged in.
+        /// </summary>
+        /// <param name="studentLoginDto"></param>
+        /// <returns></returns>
         [HttpPost("Login")]
         public ActionResult Login([FromBody] StudentLoginDto studentLoginDto)
         {
@@ -114,6 +128,11 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// This method is used to generate a jwt token.
+        /// </summary>
+        /// <param name="student"></param>
+        /// <returns></returns>
         private string GenerateToken(Student student)
         {
             List<Claim> claims = new List<Claim>
@@ -137,7 +156,10 @@ namespace Backend.Controllers
             return jwt;
         }
 
-        // Not Required
+        /// <summary>
+        /// To get all the registered students 
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("AllStudents")]
         public IActionResult GetStudents()
         {
@@ -155,7 +177,10 @@ namespace Backend.Controllers
             }
         }
 
-        // Change later remove id
+        /// <summary>
+        /// To get details of the logged in student
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Authorize(Roles = "Student")]
         public IActionResult GetStudent()
@@ -166,7 +191,7 @@ namespace Backend.Controllers
                     .Where(x => x.AadharNumber == GetStudentAadharNumber())
                     .FirstOrDefault();
 
-                if (student == null) return NotFound();
+                if (student == null) return NotFound("No student present");
 
                 return Ok(student);
             }
@@ -176,8 +201,14 @@ namespace Backend.Controllers
             }
         }
 
-        // Remove later, only admin should be able to do this
+        /// <summary>
+        /// To delete a student. Only ministry (admin user) is authorized to delete a 
+        /// student from database.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Ministry")]
         public IActionResult DeleteStudent(int id)
         {
             try
@@ -196,8 +227,13 @@ namespace Backend.Controllers
             }
         }
 
-        // revove this later, only admin should be able to do this
+        /// <summary>
+        /// To delete an application. Only ministry is authorized
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("DeleteApplication/{id}")]
+        [Authorize(Roles = "Ministry")]
         public IActionResult DeleteApplication(int id)
         {
             try
@@ -216,7 +252,12 @@ namespace Backend.Controllers
             }
         }
 
-        // needs to be modified, student id should be taken from jwt token not passed by json request
+        /// <summary>
+        /// To create a scholarship application form for the logged in student. Only student is
+        /// authorized to create an application
+        /// </summary>
+        /// <param name="studentApplicationDto"></param>
+        /// <returns></returns>
         [HttpPost("CreateApplication")]
         [Authorize(Roles = "Student")]
         public IActionResult CreateApplication([FromBody] StudentApplicationDto studentApplicationDto)
@@ -297,7 +338,10 @@ namespace Backend.Controllers
             }
         }
 
-        // remove this later
+        /// <summary>
+        /// To get all the applications from database
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("AllApplications")]
         public IActionResult GetApplications()
         {
@@ -315,7 +359,10 @@ namespace Backend.Controllers
             }
         }
 
-        // modify to remove taking id
+        /// <summary>
+        /// To get all the applications which are pending approval form authorities
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("PendingApplications")]
         [Authorize(Roles = "Student")]
         public IActionResult GetApplication()
@@ -326,7 +373,7 @@ namespace Backend.Controllers
                     .Where(x => x.AadharNumber == GetStudentAadharNumber())
                     .ToList();
 
-                if (!pendingStudentApplication.Any()) return NotFound(new { Message = "No Application Pending" });
+                if (!pendingStudentApplication.Any()) return NotFound("No Application Pending");
 
                 return Ok(pendingStudentApplication);
             }
@@ -336,6 +383,11 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// To check the status of the application
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("CheckApplicationStatus/{id}")]
         [Authorize(Roles = "Student")]
         public IActionResult GetStatus(int id)
@@ -344,7 +396,7 @@ namespace Backend.Controllers
             {
                 var application = _context.ScholarshipApplications.Find(id);
 
-                if (application == null) return NotFound(new { Message = "Application not found" });
+                if (application == null) return NotFound("Application not found");
 
                 var instituteApprovalStatus = application.ApprovedByInstitute;
                 var officerApprovalStatus = application.ApprovedByOfficer;
@@ -360,10 +412,21 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// To get the aadhar number of the logged in student
+        /// </summary>
+        /// <returns></returns>
         private string GetStudentAadharNumber()
         {
             return User?.Identity?.Name;
         }
+
+        /// <summary>
+        /// To generate a hash of the password to securely store the password in database
+        /// </summary>
+        /// <param name="password"></param>
+        /// <param name="passwordHash"></param>
+        /// <param name="passwordSalt"></param>
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using (var hmac = new HMACSHA512())
@@ -373,6 +436,14 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// To verify if the password provided by user matched with the hashed password
+        /// stored in the database
+        /// </summary>
+        /// <param name="password"></param>
+        /// <param name="passwordHash"></param>
+        /// <param name="passwordSalt"></param>
+        /// <returns></returns>
         private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
             using (var hmac = new HMACSHA512(passwordSalt))

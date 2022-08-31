@@ -20,6 +20,10 @@ namespace Backend.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// To get all the scholarship schemes present in the database
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult GetSchemes()
         {
@@ -27,10 +31,7 @@ namespace Backend.Controllers
             {
                 var schemes = _context.ScholarshipSchemes.ToList();
 
-                if (!schemes.Any())
-                {
-                    return NotFound("No Scheme Present");
-                }
+                if (!schemes.Any()) return NotFound("No Scheme Present");
 
                 var schemesDto = schemes.Select(x => new SchemeResponseDto
                 {
@@ -47,6 +48,11 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// To get details of a scholarship schemes by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public IActionResult GetScheme(int id)
         {
@@ -54,10 +60,7 @@ namespace Backend.Controllers
             {
                 var scheme = _context.ScholarshipSchemes.Find(id);
 
-                if (scheme == null)
-                {
-                    return NotFound("Scheme not present");
-                }
+                if (scheme == null) return NotFound("Scheme not present");
 
                 return Ok(new SchemeResponseDto
                 {
@@ -72,6 +75,11 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// To create a new scholarship scheme. Only ministry is authorized to create new scheme
+        /// </summary>
+        /// <param name="scholarshipSchemeDto"></param>
+        /// <returns></returns>
         [HttpPost]
         [Authorize(Roles = "Ministry")]
         public IActionResult CreateScheme([FromBody] ScholarshipSchemeDto scholarshipSchemeDto)
@@ -85,7 +93,9 @@ namespace Backend.Controllers
                 };
 
                 _context.ScholarshipSchemes.Add(scheme);
+
                 var result = _context.SaveChanges() > 0;
+
                 if (result)
                 {
                     return Ok(result);
@@ -101,6 +111,12 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// To edit an existing scholarship scheme. Only ministry is authorized to edit the schemes
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="scholarshipSchemeDto"></param>
+        /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize(Roles = "Ministry")]
         public IActionResult EditScheme(int id, [FromBody] ScholarshipSchemeDto scholarshipSchemeDto)
@@ -108,10 +124,12 @@ namespace Backend.Controllers
             try
             {
                 var scheme = _context.ScholarshipSchemes.Find(id);
+
                 scheme.Name = scholarshipSchemeDto.Name;
                 scheme.Description = scholarshipSchemeDto.Description;
 
                 var result = _context.SaveChanges() > 0;
+
                 if (result)
                 {
                     return Ok(new { Result = result });
@@ -127,6 +145,12 @@ namespace Backend.Controllers
             }
         }
 
+        /// <summary>
+        /// To delete an existing scholarship scheme. Only ministry is authorizes to delete schemes
+        /// from database
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Ministry")]
         public IActionResult DeleteScheme(int id)
@@ -134,9 +158,11 @@ namespace Backend.Controllers
             try
             {
                 var scheme = _context.ScholarshipSchemes.Find(id);
+
                 _context.ScholarshipSchemes.Remove(scheme);
 
                 var result = _context.SaveChanges() > 0;
+
                 if (result)
                 {
                     var schemes = _context.ScholarshipSchemes.ToList();
