@@ -32,7 +32,7 @@ namespace Backend.Models
         [ForeignKey("Institute")]
         public int InstituteId { get; set; }
         public Institute Institute { get; set; }
-        public ScholarshipApplication ScholarshipApplication { get; set; }
+        public ICollection<ScholarshipApplication> ScholarshipApplication { get; set; }
     }
 }
 

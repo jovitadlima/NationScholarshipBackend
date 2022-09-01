@@ -45,10 +45,11 @@ namespace Backend.Controllers
 
                 if (checkStudent) return BadRequest("Student already exists");
 
-                var checkInstitute = _context.Institutes.Any(x => x.InstituteCode == studentRegisterDto.InstituteCode);
+                var checkInstitute = _context.Institutes
+                    .Any(x => x.InstituteCode == studentRegisterDto.InstituteCode
+                        && x.ApprovedByMinistry && x.ApprovedByOfficer && !x.IsRejected);
 
                 if (!checkInstitute) return BadRequest($"Institute with code {studentRegisterDto.InstituteCode} does not exists");
-
 
                 if (studentRegisterDto.Password != studentRegisterDto.Password2)
                 {
@@ -131,34 +132,6 @@ namespace Backend.Controllers
             {
                 return BadRequest(ex.InnerException.Message);
             }
-        }
-
-        /// <summary>
-        /// This method is used to generate a jwt token.
-        /// </summary>
-        /// <param name="student"></param>
-        /// <returns></returns>
-        private string GenerateToken(Student student)
-        {
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, student.AadharNumber),
-                new Claim(ClaimTypes.Role, "Student")
-            };
-
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:Token").Value));
-
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            var token = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials: creds);
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return jwt;
         }
 
         /// <summary>
@@ -283,9 +256,13 @@ namespace Backend.Controllers
                     return BadRequest("Institute Code is not equal");
                 }
 
-                var check = _context.ScholarshipApplications.Any(app => app.StudentId == student.StudentId);
+                var appliedApplications = _context.ScholarshipApplications.Where(a=> a.AadharNumber == GetStudentAadharNumber());
 
-                if (check) return BadRequest(new { Message = "You have already applied for this scheme" });
+                int checkSchemeId = Convert.ToInt32(studentApplicationDto.SchemeId);
+
+                var check = appliedApplications.Any(app => app.SchemeId == checkSchemeId);
+
+                if (check) return BadRequest("You have already applied for this scheme");
 
                 var studentApplication = new ScholarshipApplication()
                 {
@@ -328,7 +305,17 @@ namespace Backend.Controllers
                     Pincode = studentApplicationDto.Pincode,
                     StudentId = student.StudentId,
                     SchemeId = Convert.ToInt32(studentApplicationDto.SchemeId),
-                    InstituteCode = studentApplicationDto.InstituteCode
+                    InstituteCode = studentApplicationDto.InstituteCode,
+                    DomicileCertificate = studentApplicationDto.DomicileCertificate,
+                    Photo = studentApplicationDto.Photo,
+                    InstituteIdCard = studentApplicationDto.InstituteIdCard,
+                    CasteOrIncomeCertificate = studentApplicationDto.CasteOrIncomeCertificate,
+                    PreviousYearMarksheet = studentApplicationDto.PreviousYearMarksheet,
+                    FeeReceiptOfCurrentYear = studentApplicationDto.FeeReceiptOfCurrentYear,
+                    BankPassBook = studentApplicationDto.BankPassBook,
+                    AadharCard = studentApplicationDto.AadharCard,
+                    MarkSheet10 = studentApplicationDto.MarkSheet10,
+                    MarkSheet12 = studentApplicationDto.MarkSheet12
                 };
 
                 _context.ScholarshipApplications.Add(studentApplication);
@@ -456,6 +443,34 @@ namespace Backend.Controllers
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(passwordHash);
             }
+        }
+
+        /// <summary>
+        /// This method is used to generate a jwt token.
+        /// </summary>
+        /// <param name="student"></param>
+        /// <returns></returns>
+        private string GenerateToken(Student student)
+        {
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, student.AadharNumber),
+                new Claim(ClaimTypes.Role, "Student")
+            };
+
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+                _configuration.GetSection("AppSettings:Token").Value));
+
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: creds);
+
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return jwt;
         }
     }
 }

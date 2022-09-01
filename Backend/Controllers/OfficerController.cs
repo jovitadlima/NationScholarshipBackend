@@ -58,34 +58,6 @@ namespace Backend.Controllers
         }
 
         /// <summary>
-        /// This method is used to generate a jwt token.
-        /// </summary>
-        /// <param name="officer"></param>
-        /// <returns></returns>
-        private string GenerateToken(NodalOfficer officer)
-        {
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, officer.OfficerEmail),
-                new Claim(ClaimTypes.Role, "Officer")
-            };
-
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:Token").Value));
-
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            var token = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials: creds);
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return jwt;
-        }
-
-        /// <summary>
         /// To get a list of institutes pending verification by officer
         /// </summary>
         /// <returns></returns>
@@ -380,6 +352,34 @@ namespace Backend.Controllers
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(passwordHash);
             }
+        }
+
+        /// <summary>
+        /// This method is used to generate a jwt token.
+        /// </summary>
+        /// <param name="officer"></param>
+        /// <returns></returns>
+        private string GenerateToken(NodalOfficer officer)
+        {
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, officer.OfficerEmail),
+                new Claim(ClaimTypes.Role, "Officer")
+            };
+
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+                _configuration.GetSection("AppSettings:Token").Value));
+
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: creds);
+
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return jwt;
         }
     }
 }

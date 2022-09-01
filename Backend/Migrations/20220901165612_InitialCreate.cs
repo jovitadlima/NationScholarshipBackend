@@ -29,7 +29,7 @@ namespace Backend.Migrations
                     AddressCity = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AddressState = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AddressDistrict = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AddressPincode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AddressPincode = table.Column<int>(type: "int", nullable: false),
                     PrincipalName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MobileNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Telephone = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -133,9 +133,10 @@ namespace Backend.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AadharNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Community = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Religion = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FatherName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MotherName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AnnualIncome = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AnnualIncome = table.Column<int>(type: "int", nullable: false),
                     InstituteName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PresentCourse = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PresentCourseYear = table.Column<int>(type: "int", nullable: false),
@@ -144,21 +145,21 @@ namespace Backend.Migrations
                     UniversityBoardName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PreviousCourse = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PreviousPassingYear = table.Column<int>(type: "int", nullable: false),
-                    PreviousClassPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PreviousClassPercentage = table.Column<int>(type: "int", nullable: false),
                     RollNo10 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BoardName10 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PassingYear10 = table.Column<int>(type: "int", nullable: false),
-                    Percentage10 = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Percentage10 = table.Column<int>(type: "int", nullable: false),
                     RollNo12 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BoardName12 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PassingYear12 = table.Column<int>(type: "int", nullable: false),
-                    Percentage12 = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Percentage12 = table.Column<int>(type: "int", nullable: false),
                     AddmissionFee = table.Column<int>(type: "int", nullable: false),
                     TutionFee = table.Column<int>(type: "int", nullable: false),
                     OtherFee = table.Column<int>(type: "int", nullable: false),
-                    IsDisabled = table.Column<bool>(type: "bit", nullable: false),
+                    IsDisabled = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TypeOfDisability = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PercentageDisability = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PercentageDisability = table.Column<int>(type: "int", nullable: false),
                     MartialStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ParentProfession = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     State = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -170,7 +171,6 @@ namespace Backend.Migrations
                     ApprovedByInstitute = table.Column<bool>(type: "bit", nullable: false),
                     ApprovedByOfficer = table.Column<bool>(type: "bit", nullable: false),
                     ApprovedByMinistry = table.Column<bool>(type: "bit", nullable: false),
-                    CertificateUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     InstituteCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsRejected = table.Column<bool>(type: "bit", nullable: false),
                     DomicileCertificate = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -181,10 +181,10 @@ namespace Backend.Migrations
                     FeeReceiptOfCurrentYear = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BankPassBook = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AadharCard = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    _10thMarkSheet = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    _12thMarkSheet = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StudentId = table.Column<int>(type: "int", nullable: false),
-                    SchemeId = table.Column<int>(type: "int", nullable: false)
+                    MarkSheet10 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MarkSheet12 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SchemeId = table.Column<int>(type: "int", nullable: false),
+                    StudentId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -206,12 +206,12 @@ namespace Backend.Migrations
             migrationBuilder.InsertData(
                 table: "Ministries",
                 columns: new[] { "MinistryId", "MinistryEmail", "Name", "PasswordHash", "PasswordSalt" },
-                values: new object[] { 1, "ministry@nsp.com", "Ministry", new byte[] { 117, 28, 197, 232, 63, 111, 70, 221, 248, 248, 104, 118, 159, 254, 216, 76, 174, 197, 180, 224, 65, 233, 68, 59, 177, 123, 26, 45, 175, 122, 0, 202, 79, 27, 114, 152, 148, 166, 130, 43, 55, 168, 85, 243, 24, 100, 62, 98, 235, 13, 110, 96, 155, 157, 230, 203, 179, 161, 113, 180, 53, 40, 103, 26 }, new byte[] { 170, 94, 193, 71, 179, 92, 219, 193, 229, 242, 12, 93, 181, 243, 164, 75, 240, 172, 230, 96, 27, 234, 10, 51, 86, 53, 95, 238, 138, 244, 55, 121, 9, 184, 71, 123, 208, 113, 14, 62, 92, 43, 6, 171, 92, 196, 253, 1, 137, 51, 173, 12, 0, 4, 77, 145, 113, 219, 47, 21, 28, 179, 233, 142, 244, 116, 163, 125, 195, 71, 157, 164, 240, 249, 246, 75, 150, 22, 101, 129, 45, 173, 220, 44, 226, 242, 53, 134, 82, 1, 184, 205, 92, 78, 106, 137, 237, 190, 217, 122, 212, 90, 59, 2, 153, 127, 43, 195, 223, 64, 225, 106, 31, 139, 19, 60, 36, 80, 39, 245, 103, 233, 99, 110, 43, 98, 61, 20 } });
+                values: new object[] { 1, "ministry@nsp.com", "Ministry", new byte[] { 196, 196, 210, 25, 134, 31, 198, 50, 197, 255, 26, 188, 159, 225, 152, 181, 224, 233, 57, 23, 192, 41, 240, 242, 154, 65, 46, 83, 93, 52, 160, 105, 108, 94, 231, 201, 158, 146, 219, 239, 130, 63, 194, 167, 210, 132, 79, 151, 249, 234, 207, 1, 173, 148, 110, 84, 149, 51, 175, 96, 153, 226, 239, 11 }, new byte[] { 195, 147, 239, 64, 216, 226, 202, 136, 81, 171, 239, 37, 47, 126, 141, 1, 7, 17, 122, 234, 7, 171, 35, 182, 38, 24, 190, 15, 124, 102, 157, 46, 165, 144, 84, 51, 103, 165, 30, 46, 55, 70, 200, 126, 126, 94, 242, 254, 122, 52, 78, 81, 140, 21, 84, 145, 68, 46, 219, 248, 96, 90, 193, 119, 74, 134, 174, 150, 47, 162, 65, 28, 187, 93, 164, 125, 172, 20, 144, 41, 180, 204, 248, 141, 164, 242, 172, 237, 64, 181, 181, 19, 90, 229, 251, 248, 207, 31, 126, 104, 18, 4, 194, 252, 122, 253, 9, 92, 101, 11, 244, 41, 143, 253, 198, 216, 198, 4, 143, 100, 81, 95, 8, 223, 51, 111, 210, 135 } });
 
             migrationBuilder.InsertData(
                 table: "NodalOfficers",
                 columns: new[] { "OfficerId", "OfficerEmail", "OfficerName", "PasswordHash", "PasswordSalt" },
-                values: new object[] { 1, "officer@nsp.com", "Officer", new byte[] { 15, 255, 122, 79, 71, 153, 99, 51, 26, 186, 244, 143, 160, 5, 25, 184, 8, 27, 132, 155, 46, 80, 214, 139, 198, 132, 43, 143, 193, 50, 205, 17, 154, 222, 1, 54, 197, 49, 247, 167, 107, 64, 128, 215, 245, 61, 157, 147, 148, 200, 250, 36, 119, 253, 199, 217, 200, 162, 249, 17, 15, 159, 74, 128 }, new byte[] { 82, 198, 153, 101, 101, 130, 133, 201, 210, 134, 11, 83, 222, 37, 47, 155, 0, 191, 45, 206, 169, 250, 186, 193, 102, 168, 254, 34, 156, 186, 51, 31, 235, 239, 161, 180, 169, 203, 212, 121, 200, 16, 163, 52, 184, 37, 152, 113, 112, 71, 183, 202, 40, 248, 48, 77, 204, 120, 202, 162, 150, 37, 113, 27, 42, 206, 45, 120, 107, 146, 223, 198, 74, 18, 216, 133, 231, 139, 251, 121, 111, 69, 221, 136, 18, 42, 246, 202, 155, 4, 208, 3, 149, 38, 113, 92, 123, 181, 199, 92, 5, 98, 32, 4, 201, 20, 26, 5, 116, 191, 181, 129, 47, 60, 145, 177, 53, 155, 69, 217, 126, 4, 240, 71, 85, 32, 142, 20 } });
+                values: new object[] { 1, "officer@nsp.com", "Officer", new byte[] { 179, 46, 117, 229, 18, 228, 48, 91, 255, 75, 84, 163, 110, 93, 131, 5, 247, 12, 122, 239, 49, 86, 112, 169, 44, 108, 207, 59, 182, 153, 86, 252, 227, 78, 66, 71, 163, 255, 206, 185, 105, 188, 136, 184, 243, 174, 53, 74, 88, 0, 229, 156, 212, 248, 67, 54, 143, 155, 117, 204, 213, 61, 69, 244 }, new byte[] { 196, 113, 219, 23, 51, 234, 191, 34, 119, 205, 225, 69, 12, 2, 188, 182, 247, 1, 45, 56, 168, 96, 110, 216, 212, 204, 47, 121, 142, 161, 58, 140, 213, 31, 102, 0, 134, 65, 37, 229, 33, 69, 2, 103, 93, 83, 164, 200, 41, 197, 205, 100, 147, 173, 202, 211, 228, 175, 67, 247, 196, 222, 113, 246, 28, 112, 202, 182, 49, 205, 111, 188, 100, 49, 18, 69, 27, 240, 129, 2, 126, 75, 75, 63, 1, 131, 64, 159, 43, 89, 218, 115, 157, 126, 189, 184, 81, 52, 127, 153, 20, 152, 51, 214, 81, 81, 115, 250, 198, 14, 227, 137, 231, 187, 121, 55, 10, 191, 21, 95, 225, 158, 28, 73, 12, 98, 124, 175 } });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Institutes_DiseCode_InstituteCode",
@@ -228,8 +228,7 @@ namespace Backend.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ScholarshipApplications_StudentId",
                 table: "ScholarshipApplications",
-                column: "StudentId",
-                unique: true);
+                column: "StudentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Students_AadharNumber_PhoneNo_BankAccountNumber",

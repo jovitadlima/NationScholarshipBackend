@@ -38,8 +38,8 @@ namespace Backend.Migrations
                     b.Property<string>("AddressLine2")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AddressPincode")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("AddressPincode")
+                        .HasColumnType("int");
 
                     b.Property<string>("AddressState")
                         .HasColumnType("nvarchar(max)");
@@ -145,8 +145,8 @@ namespace Backend.Migrations
                             MinistryId = 1,
                             MinistryEmail = "ministry@nsp.com",
                             Name = "Ministry",
-                            PasswordHash = new byte[] { 127, 42, 92, 197, 84, 202, 155, 66, 33, 205, 24, 7, 199, 43, 53, 186, 188, 236, 33, 13, 210, 125, 212, 216, 116, 125, 233, 132, 51, 31, 118, 54, 159, 29, 71, 131, 80, 110, 203, 118, 252, 27, 5, 120, 93, 144, 187, 89, 146, 162, 44, 69, 104, 219, 46, 185, 242, 28, 152, 49, 235, 67, 202, 55 },
-                            PasswordSalt = new byte[] { 5, 85, 32, 215, 27, 205, 198, 108, 15, 14, 107, 109, 59, 24, 46, 219, 122, 187, 161, 233, 142, 255, 177, 185, 178, 169, 137, 147, 11, 163, 79, 168, 207, 28, 88, 104, 60, 155, 38, 32, 206, 54, 168, 243, 43, 253, 236, 24, 40, 251, 131, 116, 56, 94, 125, 157, 233, 151, 236, 81, 204, 123, 224, 146, 69, 9, 185, 222, 91, 84, 173, 7, 223, 62, 148, 200, 95, 7, 251, 95, 1, 72, 241, 61, 25, 232, 83, 91, 25, 77, 18, 163, 174, 185, 150, 220, 163, 191, 176, 178, 160, 47, 68, 169, 42, 153, 127, 184, 214, 74, 133, 59, 128, 153, 244, 155, 185, 227, 164, 4, 82, 31, 51, 101, 101, 227, 134, 54 }
+                            PasswordHash = new byte[] { 196, 196, 210, 25, 134, 31, 198, 50, 197, 255, 26, 188, 159, 225, 152, 181, 224, 233, 57, 23, 192, 41, 240, 242, 154, 65, 46, 83, 93, 52, 160, 105, 108, 94, 231, 201, 158, 146, 219, 239, 130, 63, 194, 167, 210, 132, 79, 151, 249, 234, 207, 1, 173, 148, 110, 84, 149, 51, 175, 96, 153, 226, 239, 11 },
+                            PasswordSalt = new byte[] { 195, 147, 239, 64, 216, 226, 202, 136, 81, 171, 239, 37, 47, 126, 141, 1, 7, 17, 122, 234, 7, 171, 35, 182, 38, 24, 190, 15, 124, 102, 157, 46, 165, 144, 84, 51, 103, 165, 30, 46, 55, 70, 200, 126, 126, 94, 242, 254, 122, 52, 78, 81, 140, 21, 84, 145, 68, 46, 219, 248, 96, 90, 193, 119, 74, 134, 174, 150, 47, 162, 65, 28, 187, 93, 164, 125, 172, 20, 144, 41, 180, 204, 248, 141, 164, 242, 172, 237, 64, 181, 181, 19, 90, 229, 251, 248, 207, 31, 126, 104, 18, 4, 194, 252, 122, 253, 9, 92, 101, 11, 244, 41, 143, 253, 198, 216, 198, 4, 143, 100, 81, 95, 8, 223, 51, 111, 210, 135 }
                         });
                 });
 
@@ -179,8 +179,8 @@ namespace Backend.Migrations
                             OfficerId = 1,
                             OfficerEmail = "officer@nsp.com",
                             OfficerName = "Officer",
-                            PasswordHash = new byte[] { 191, 26, 245, 111, 44, 128, 193, 240, 197, 59, 101, 105, 59, 171, 208, 62, 65, 137, 130, 75, 191, 62, 185, 210, 153, 8, 48, 90, 57, 167, 230, 3, 75, 235, 48, 225, 4, 250, 72, 6, 80, 40, 163, 49, 196, 94, 185, 139, 122, 130, 230, 191, 108, 91, 158, 189, 106, 111, 205, 8, 174, 159, 214, 104 },
-                            PasswordSalt = new byte[] { 86, 190, 185, 192, 173, 198, 41, 18, 181, 40, 92, 152, 15, 236, 229, 52, 36, 46, 96, 230, 163, 223, 110, 45, 73, 239, 162, 109, 49, 204, 61, 47, 210, 164, 172, 129, 187, 88, 196, 29, 87, 137, 86, 242, 13, 102, 152, 76, 100, 72, 151, 108, 233, 174, 72, 125, 5, 101, 210, 8, 79, 183, 246, 96, 161, 15, 253, 174, 138, 97, 9, 143, 238, 45, 196, 151, 67, 18, 132, 64, 216, 159, 102, 184, 13, 134, 139, 147, 22, 59, 191, 157, 49, 45, 224, 137, 239, 213, 96, 119, 117, 161, 158, 21, 10, 6, 221, 185, 182, 161, 76, 89, 42, 85, 246, 67, 158, 165, 67, 39, 8, 72, 116, 91, 90, 22, 162, 55 }
+                            PasswordHash = new byte[] { 179, 46, 117, 229, 18, 228, 48, 91, 255, 75, 84, 163, 110, 93, 131, 5, 247, 12, 122, 239, 49, 86, 112, 169, 44, 108, 207, 59, 182, 153, 86, 252, 227, 78, 66, 71, 163, 255, 206, 185, 105, 188, 136, 184, 243, 174, 53, 74, 88, 0, 229, 156, 212, 248, 67, 54, 143, 155, 117, 204, 213, 61, 69, 244 },
+                            PasswordSalt = new byte[] { 196, 113, 219, 23, 51, 234, 191, 34, 119, 205, 225, 69, 12, 2, 188, 182, 247, 1, 45, 56, 168, 96, 110, 216, 212, 204, 47, 121, 142, 161, 58, 140, 213, 31, 102, 0, 134, 65, 37, 229, 33, 69, 2, 103, 93, 83, 164, 200, 41, 197, 205, 100, 147, 173, 202, 211, 228, 175, 67, 247, 196, 222, 113, 246, 28, 112, 202, 182, 49, 205, 111, 188, 100, 49, 18, 69, 27, 240, 129, 2, 126, 75, 75, 63, 1, 131, 64, 159, 43, 89, 218, 115, 157, 126, 189, 184, 81, 52, 127, 153, 20, 152, 51, 214, 81, 81, 115, 250, 198, 14, 227, 137, 231, 187, 121, 55, 10, 191, 21, 95, 225, 158, 28, 73, 12, 98, 124, 175 }
                         });
                 });
 
@@ -197,11 +197,11 @@ namespace Backend.Migrations
                     b.Property<string>("AadharNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AddmissionFee")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("AddmissionFee")
+                        .HasColumnType("int");
 
-                    b.Property<string>("AnnualIncome")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("AnnualIncome")
+                        .HasColumnType("int");
 
                     b.Property<bool>("ApprovedByInstitute")
                         .HasColumnType("bit");
@@ -225,9 +225,6 @@ namespace Backend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CasteOrIncomeCertificate")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CertificateUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClassStartDate")
@@ -281,47 +278,47 @@ namespace Backend.Migrations
                     b.Property<string>("MotherName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OtherFee")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("OtherFee")
+                        .HasColumnType("int");
 
                     b.Property<string>("ParentProfession")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PassingYear10")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PassingYear10")
+                        .HasColumnType("int");
 
-                    b.Property<string>("PassingYear12")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PassingYear12")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Percentage10")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Percentage10")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Percentage12")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Percentage12")
+                        .HasColumnType("int");
 
-                    b.Property<string>("PercentageDisability")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PercentageDisability")
+                        .HasColumnType("int");
 
                     b.Property<string>("Photo")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Pincode")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Pincode")
+                        .HasColumnType("int");
 
                     b.Property<string>("PresentCourse")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PresentCourseYear")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PresentCourseYear")
+                        .HasColumnType("int");
 
-                    b.Property<string>("PreviousClassPercentage")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PreviousClassPercentage")
+                        .HasColumnType("int");
 
                     b.Property<string>("PreviousCourse")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PreviousPassingYear")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PreviousPassingYear")
+                        .HasColumnType("int");
 
                     b.Property<string>("PreviousYearMarksheet")
                         .HasColumnType("nvarchar(max)");
@@ -347,8 +344,8 @@ namespace Backend.Migrations
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
-                    b.Property<string>("TutionFee")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("TutionFee")
+                        .HasColumnType("int");
 
                     b.Property<string>("TypeOfDisability")
                         .HasColumnType("nvarchar(max)");
@@ -360,8 +357,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("SchemeId");
 
-                    b.HasIndex("StudentId")
-                        .IsUnique();
+                    b.HasIndex("StudentId");
 
                     b.ToTable("ScholarshipApplications");
                 });
@@ -456,8 +452,8 @@ namespace Backend.Migrations
                         .IsRequired();
 
                     b.HasOne("Backend.Models.Student", "Student")
-                        .WithOne("ScholarshipApplication")
-                        .HasForeignKey("Backend.Models.ScholarshipApplication", "StudentId")
+                        .WithMany("ScholarshipApplication")
+                        .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

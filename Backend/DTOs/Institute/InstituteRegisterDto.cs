@@ -20,12 +20,15 @@ namespace Backend.DTOs.Institute
         public string AddressCity { get; set; }
         public string AddressState { get; set; }
         public string AddressDistrict { get; set; }
-        public string AddressPincode { get; set; }
+        public int AddressPincode { get; set; }
         public string PrincipalName { get; set; }
         public string MobileNumber { get; set; }
         public string Telephone { get; set; }
 
         public string Password { get; set; }
         public string Password2 { get; set; }
+
+        public string RegistrationCertificate { get; set; } 
+        public string UniversityAffliationCertificate { get; set; } 
     }
 }

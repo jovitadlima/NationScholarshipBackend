@@ -75,7 +75,9 @@ namespace Backend.Controllers
                     MobileNumber = instituteRegisterDto.MobileNumber,
                     Telephone = instituteRegisterDto.Telephone,
                     PasswordHash = passwordHash,
-                    PasswordSalt = passwordSalt
+                    PasswordSalt = passwordSalt,
+                    RegistrationCertificate = instituteRegisterDto.RegistrationCertificate,
+                    UniversityAffliationCertificate = instituteRegisterDto.UniversityAffliationCertificate
                 };
 
                 _context.Institutes.Add(institute);
@@ -114,6 +116,7 @@ namespace Backend.Controllers
 
                 if (instituteUser == null) return NotFound("User not found");
 
+                if (instituteUser.IsRejected) return BadRequest("Your registration application has been rejected");
 
                 if (!GetRegistrationStatus(instituteUser))
                 {
@@ -132,34 +135,6 @@ namespace Backend.Controllers
             {
                 return BadRequest(ex.InnerException.Message);
             }
-        }
-
-        /// <summary>
-        /// This method is used to generate a jwt token.
-        /// </summary>
-        /// <param name="institute"></param>
-        /// <returns></returns>
-        private string GenerateToken(Institute institute)
-        {
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, institute.InstituteCode),
-                new Claim(ClaimTypes.Role, "Institute")
-            };
-
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:Token").Value));
-
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            var token = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials: creds);
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return jwt;
         }
 
         /// <summary>
@@ -219,7 +194,9 @@ namespace Backend.Controllers
         {
             try
             {
-                var institutes = _context.Institutes.ToList();
+                var institutes = _context.Institutes
+                    .Where(x => x.ApprovedByOfficer && x.ApprovedByMinistry && !x.IsRejected)
+                    .ToList();
 
                 if (!institutes.Any()) return NotFound("No Student Present");
 
@@ -476,6 +453,34 @@ namespace Backend.Controllers
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(passwordHash);
             }
+        }
+
+        /// <summary>
+        /// This method is used to generate a jwt token.
+        /// </summary>
+        /// <param name="institute"></param>
+        /// <returns></returns>
+        private string GenerateToken(Institute institute)
+        {
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, institute.InstituteCode),
+                new Claim(ClaimTypes.Role, "Institute")
+            };
+
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+                _configuration.GetSection("AppSettings:Token").Value));
+
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: creds);
+
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return jwt;
         }
     }
 }

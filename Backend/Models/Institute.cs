@@ -26,7 +26,7 @@ namespace Backend.Models
         public string AddressCity { get; set; }
         public string AddressState { get; set; }
         public string AddressDistrict { get; set; }
-        public string AddressPincode { get; set; }
+        public int AddressPincode { get; set; }
         public string PrincipalName { get; set; }
         public string MobileNumber { get; set; }
         public string Telephone { get; set; }
